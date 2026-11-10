@@ -3,463 +3,1266 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crouton Alpha — IA que Aprende Gestos | Feira de Ciências</title>
+<title>Crouton Alpha — IA que Aprende Gestos | Feira de Ciências 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0d1117;
-    --bg2:#111827;
-    --card:rgba(255,255,255,.055);
-    --border:rgba(255,255,255,.09);
-    --text:#f8fafc;
-    --muted:#94a3b8;
-    --accent:#22c55e;
-    --accent2:#38bdf8;
-    --danger:#f87171;
-    --radius:20px;
-    --shadow:0 12px 40px rgba(0,0,0,.35);
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    margin:0; font-family:'Inter',system-ui,sans-serif; color:var(--text);
-    background:
-      radial-gradient(800px 420px at 18% -8%, rgba(56,189,248,.10), transparent 60%),
-      radial-gradient(700px 420px at 88% 0%, rgba(34,197,94,.08), transparent 60%),
-      linear-gradient(180deg, var(--bg), var(--bg2));
-    min-height:100vh;
-    overflow-x:hidden;
+  :root {
+    --bg-dark: #07090e;
+    --bg-card: rgba(15, 23, 42, 0.75);
+    --bg-card-hover: rgba(30, 41, 59, 0.85);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-glow: rgba(56, 189, 248, 0.4);
+
+    --primary: #38bdf8;
+    --primary-glow: rgba(56, 189, 248, 0.35);
+    --accent: #22c55e;
+    --accent-glow: rgba(34, 197, 94, 0.35);
+    --purple: #a855f7;
+    --amber: #f59e0b;
+    --danger: #f87171;
+
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow-main: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(56, 189, 248, 0.05);
   }
 
-  header{position:relative;z-index:1;padding:32px 24px 10px;text-align:center}
-  .logo{
-    display:inline-flex;align-items:center;gap:12px;
-    background:rgba(255,255,255,.05);
-    border:1px solid var(--border); border-radius:999px; padding:7px 16px 7px 7px;
-    margin-bottom:16px;
-  }
-  .logoIcon{
-    width:38px;height:38px;border-radius:50%;
-    background:linear-gradient(135deg,#38bdf8,#22c55e);
-    display:grid;place-items:center;font-size:20px;
-  }
-  .logo span{font-weight:700;letter-spacing:.02em;font-size:14px}
-  .logo small{display:block;font-weight:500;color:var(--muted);font-size:11px;text-align:left;letter-spacing:.06em}
-
-  h1{
-    margin:0; font-family:'Space Grotesk',sans-serif;
-    font-size:clamp(28px,4.5vw,50px); line-height:1.02; letter-spacing:-.025em;
-  }
-  h1 .grad{
-    background:linear-gradient(90deg,#38bdf8,#22c55e);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
-  .sub{color:var(--muted);margin:12px auto 0;max-width:600px;font-size:15.5px;line-height:1.55}
-  .badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
-  .badge{
-    background:rgba(255,255,255,.045);border:1px solid var(--border);
-    padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;color:#cbd5e1;
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: var(--text-main);
+    background: var(--bg-dark);
+    background-image:
+      radial-gradient(1000px 600px at 15% -10%, rgba(56, 189, 248, 0.15), transparent 70%),
+      radial-gradient(800px 500px at 85% 10%, rgba(34, 197, 94, 0.12), transparent 70%),
+      radial-gradient(800px 600px at 50% 90%, rgba(168, 85, 247, 0.1), transparent 70%);
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  main{
-    position:relative;z-index:1;max-width:1180px;margin:20px auto 50px;padding:0 18px;
-    display:grid;grid-template-columns:1.45fr 1fr;gap:18px;align-items:start;
-  }
-  @media(max-width:940px){main{grid-template-columns:1fr}}
-
-  .card{
-    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
-    padding:20px; box-shadow:var(--shadow);
-  }
-  .card h2{
-    margin:0 0 14px;font-family:'Space Grotesk',sans-serif;font-size:17px;
-    display:flex;align-items:center;gap:10px;
-  }
-  .card h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
-
-  /* CAMERA */
-  #videoWrap{
-    position:relative;background:#04070f;border-radius:16px;overflow:hidden;aspect-ratio:4/3;
-    border:1px solid rgba(255,255,255,.10);
-  }
-  video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
-  canvas{position:absolute;inset:0;width:100%;height:100%;transform:scaleX(-1);pointer-events:none}
-  #liveBadge{
-    position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:3;
-    background:rgba(0,0,0,.55);
-    padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.08em;
-    display:flex;align-items:center;gap:7px;
-  }
-  #liveBadge i{width:7px;height:7px;border-radius:50%;background:#ef4444;display:block;animation:pulse 1.4s infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-  #overlayStatus{
-    position:absolute;left:12px;right:12px;bottom:12px;z-index:3;
-    background:rgba(2,6,23,.75);
-    border:1px solid rgba(255,255,255,.10);
-    padding:11px 14px;border-radius:12px;font-weight:600;text-align:center;font-size:14.5px;
+  /* Canvas background Grid Effect */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
   }
 
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  button{
-    border:0;border-radius:12px;padding:13px 16px;font-weight:700;cursor:pointer;font-size:14.5px;
-    font-family:'Inter',sans-serif; transition:.15s;
-  }
-  button:active{transform:scale(.98)}
-  button:disabled{opacity:.45;cursor:not-allowed}
-  .btn-primary{
-    background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;flex:1;
-    box-shadow:0 8px 22px rgba(34,197,94,.25);
-  }
-  .btn-primary:hover:not(:disabled){transform:translateY(-1px)}
-  .btn-blue{
-    background:linear-gradient(135deg,#38bdf8,#6366f1);color:#fff;flex:1;
-  }
-  .btn-blue:hover{transform:translateY(-1px)}
-  .btn-ghost{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--border);flex:1}
-  .btn-ghost:hover{background:rgba(255,255,255,.11)}
-  .btn-danger{
-    background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;width:100%;
-  }
-  .btn-danger:hover{transform:translateY(-1px)}
-
-  input[type="text"]{
-    width:100%;padding:13px 15px;border-radius:12px;border:1px solid var(--border);
-    background:rgba(2,6,23,.5);color:var(--text);font-size:15.5px;font-family:'Inter',sans-serif;outline:none;transition:.15s;
-  }
-  input[type="text"]:focus{border-color:rgba(56,189,248,.6)}
-  input[type="text"]::placeholder{color:#64748b}
-  .label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:8px;letter-spacing:.05em;text-transform:uppercase}
-  .small{color:var(--muted);font-size:13.5px;line-height:1.55}
-  .hint{margin-top:10px}
-
-  /* PREDICTION */
-  .predictionBox{
-    margin-top:16px;background:rgba(56,189,248,.06);
-    border:1px solid rgba(56,189,248,.18); border-radius:16px;padding:16px;
-  }
-  #bigPrediction{
-    font-family:'Space Grotesk',sans-serif;font-size:clamp(18px,2.4vw,24px);font-weight:700;
-    text-align:center;min-height:58px;display:flex;align-items:center;justify-content:center;line-height:1.3;
-  }
-  .barWrap{background:rgba(2,6,23,.6);border-radius:999px;height:10px;overflow:hidden;margin-top:10px;border:1px solid var(--border)}
-  .bar{height:100%;background:linear-gradient(90deg,#38bdf8,#22c55e);width:0%;transition:width .35s ease;border-radius:999px}
-  #confText{text-align:center;margin-top:8px;font-size:13px;color:var(--muted);font-weight:600}
-
-  .dangerZone{
-    border:1px solid rgba(248,113,113,.25);background:rgba(239,68,68,.05);
-    padding:14px;border-radius:16px;margin-top:16px;
-  }
-  .dangerZone b{display:flex;align-items:center;gap:8px}
-
-  /* STEPS */
-  .steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
-  .step{display:flex;gap:12px;align-items:flex-start}
-  .stepNum{
-    counter-increment:step;flex-shrink:0;
-    background:rgba(56,189,248,.15);color:#7dd3fc;
-    width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:13px;
-    border:1px solid rgba(56,189,248,.25);
-  }
-  .stepNum::before{content:counter(step)}
-  .step div:last-child{font-size:14px;line-height:1.5;color:#e2e8f0}
-
-  .stat{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
-  .stat span{color:var(--muted);font-size:14px}
-  .stat b{font-family:'Space Grotesk',sans-serif;font-size:17px}
-
-  #classesList{max-height:240px;overflow:auto;padding-right:4px}
-  #classesList::-webkit-scrollbar{width:6px}
-  #classesList::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:99px}
-  .classItem{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:10px 12px;background:rgba(2,6,23,.45);border:1px solid var(--border);
-    border-radius:12px;margin-top:8px;
-  }
-  .classItem strong{font-size:14.5px;text-transform:capitalize}
-  .pill{
-    background:rgba(255,255,255,.07);
-    border:1px solid rgba(255,255,255,.10);
-    padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;
-  }
-  .classBarWrap{height:5px;background:rgba(255,255,255,.08);border-radius:99px;margin-top:6px;overflow:hidden}
-  .classBarFill{height:100%;background:linear-gradient(90deg,#38bdf8,#22c55e);border-radius:99px}
-
-  #learningLog{
-    max-height:150px;overflow:auto;background:rgba(2,6,23,.5);
-    border:1px solid var(--border);border-radius:12px;padding:12px;font-size:13px;margin-top:10px;
-  }
-  #learningLog::-webkit-scrollbar{width:6px}
-  #learningLog::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:99px}
-  .logLine{padding:4px 0;color:#cbd5e1;display:flex;gap:8px}
-  .logLine::before{content:"▸";color:#38bdf8}
-
-  .exampleThumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;min-height:4px}
-  .exampleThumbs img{
-    width:58px;height:58px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
-    object-fit:cover;
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 2;
+    padding: 36px 24px 16px;
+    text-align: center;
   }
 
-  footer{position:relative;z-index:1;text-align:center;color:var(--muted);padding:6px 20px 36px;font-size:13px;line-height:1.7}
-  .kbd{background:rgba(255,255,255,.07);border:1px solid var(--border);border-bottom-width:2px;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700;color:var(--text)}
-  .divider{width:50px;height:1px;background:rgba(255,255,255,.2);margin:22px auto}
-
-  /* ===== SELETOR DE IA ===== */
-  .iaSelector{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-  @media(max-width:640px){.iaSelector{grid-template-columns:1fr}}
-  .iaCard{
-    border:1.5px solid var(--border);border-radius:16px;padding:16px;cursor:pointer;
-    background:rgba(2,6,23,.35);transition:.18s;position:relative;
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(12px);
+    border-radius: 999px;
+    padding: 6px 18px 6px 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
   }
-  .iaCard:hover{border-color:rgba(255,255,255,.2)}
-  .iaCard.active{border-color:#22c55e;background:rgba(34,197,94,.07)}
-  .iaCard.active.online{border-color:#38bdf8;background:rgba(56,189,248,.07)}
-  .iaCardTop{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .iaIcon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:19px;flex-shrink:0}
-  .iaIcon.local{background:linear-gradient(135deg,#22c55e,#16a34a)}
-  .iaIcon.online{background:linear-gradient(135deg,#38bdf8,#6366f1)}
-  .iaCard h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:15.5px}
-  .iaCard p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
-  .iaCheck{position:absolute;top:12px;right:12px;background:#22c55e;color:#052e12;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;opacity:0;transform:scale(.85);transition:.18s}
-  .iaCard.active .iaCheck{opacity:1;transform:scale(1)}
-  .iaCard.active.online .iaCheck{background:#38bdf8;color:#082f49}
-  .iaTag{display:inline-block;margin-top:10px;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.07)}
-  .pulseDot{width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:5px;animation:pulse 1.6s infinite;vertical-align:middle}
 
-  /* predição dupla */
-  .dualPred{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-  @media(max-width:640px){.dualPred{grid-template-columns:1fr}}
-  .predMini{border-radius:12px;padding:13px;border:1px solid var(--border);background:rgba(2,6,23,.45);text-align:center}
-  .predMini .who{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
-  .predMini .what{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;min-height:24px;line-height:1.2}
-  .predMini .conf{color:var(--muted);font-size:12px;margin-top:4px}
-  .predMini.winner{border-color:#22c55e;background:rgba(34,197,94,.07)}
-  .predMini.winner.online{border-color:#38bdf8}
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: grid;
+    place-items: center;
+    font-size: 19px;
+    box-shadow: 0 0 15px var(--primary-glow);
+  }
 
-  .searchRow{display:flex;gap:8px}
-  .searchRow input{flex:1}
-  .searchStatus{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(2,6,23,.5);border:1px solid var(--border);font-size:13.5px;min-height:42px;display:none;align-items:center;gap:8px}
-  .searchStatus.show{display:flex}
-  .spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.2);border-top-color:#38bdf8;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .knownList{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-  .knownChip{background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700}
-  .hiddenPanel{display:none !important}
+  .header-badge span {
+    font-weight: 700;
+    font-size: 13.5px;
+    letter-spacing: 0.03em;
+  }
+  .header-badge small {
+    display: block;
+    color: var(--primary);
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+  }
+
+  h1 {
+    margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(32px, 5.2vw, 56px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  h1 .grad-cyan {
+    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  h1 .grad-green {
+    background: linear-gradient(135deg, #34d399 0%, #22c55e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .sub {
+    color: var(--text-muted);
+    margin: 14px auto 0;
+    max-width: 640px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .badges-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .tag-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #cbd5e1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(8px);
+  }
+
+  /* LAYOUT */
+  main {
+    position: relative;
+    z-index: 2;
+    max-width: 1240px;
+    margin: 24px auto 60px;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 980px) {
+    main { grid-template-columns: 1fr; }
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(16px);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-main);
+    transition: border-color 0.25s ease;
+  }
+  .card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .card-title {
+    margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dot-indicator {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+
+  /* IA SELECTOR CARDS */
+  .ia-selector-container {
+    max-width: 1240px;
+    margin: 16px auto 0;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .ia-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 14px;
+  }
+  @media(max-width: 680px) { .ia-grid { grid-template-columns: 1fr; } }
+
+  .ia-card {
+    position: relative;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    cursor: pointer;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(10px);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+  }
+
+  .ia-card:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .ia-card.active {
+    border-color: var(--accent);
+    background: rgba(34, 197, 94, 0.08);
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.15);
+  }
+
+  .ia-card.active.online {
+    border-color: var(--primary);
+    background: rgba(56, 189, 248, 0.08);
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
+  }
+
+  .ia-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+
+  .ia-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .ia-icon.local { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
+  .ia-icon.online { background: linear-gradient(135deg, #38bdf8, #6366f1); box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
+
+  .ia-card h3 { margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; }
+  .ia-card p { margin: 0; color: var(--text-muted); font-size: 13.5px; line-height: 1.5; }
+
+  .ia-badge-active {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--accent);
+    color: #042f15;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 11px;
+    border-radius: 999px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s ease;
+  }
+  .ia-card.active .ia-badge-active { opacity: 1; transform: scale(1); }
+  .ia-card.active.online .ia-badge-active { background: var(--primary); color: #032b45; }
+
+  .ia-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+
+  /* VIDEO CONTAINER */
+  #videoWrap {
+    position: relative;
+    background: #020617;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    display: block;
+  }
+
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(-1);
+    pointer-events: none;
+  }
+
+  #flashOverlay {
+    position: absolute;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease-out;
+    z-index: 10;
+  }
+
+  #liveBadge {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    background: rgba(2, 6, 23, 0.75);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #overlayStatus {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    z-index: 4;
+    background: rgba(2, 6, 23, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-align: center;
+    font-size: 14.5px;
+    color: var(--text-main);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  /* BUTTONS & INPUTS */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  button {
+    border: 0;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14.5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #22c55e, #15803d);
+    color: #ffffff;
+    flex: 1;
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3);
+  }
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 8px 25px rgba(34, 197, 94, 0.45);
+    transform: translateY(-2px);
+  }
+
+  .btn-blue {
+    background: linear-gradient(135deg, #38bdf8, #4f46e5);
+    color: #ffffff;
+    flex: 1;
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.3);
+  }
+  .btn-blue:hover:not(:disabled) {
+    box-shadow: 0 8px 25px rgba(56, 189, 248, 0.45);
+    transform: translateY(-2px);
+  }
+
+  .btn-ghost {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    flex: 1;
+  }
+  .btn-ghost:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: #ffffff;
+    width: 100%;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.25);
+  }
+  .btn-danger:hover:not(:disabled) {
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+    transform: translateY(-2px);
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-color);
+    background: rgba(2, 6, 23, 0.6);
+    color: var(--text-main);
+    font-size: 15px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  input[type="text"]:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px var(--primary-glow);
+  }
+  input[type="text"]::placeholder { color: #64748b; }
+
+  .input-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 8px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* RADAR / DEDOS VISUALIZER */
+  .hand-radar-box {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(2, 6, 23, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 12px;
+    margin-top: 14px;
+  }
+
+  .finger-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .finger-bar-outer {
+    width: 8px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .finger-bar-inner {
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(180deg, #38bdf8, #22c55e);
+    border-radius: 999px;
+    transition: height 0.15s ease-out;
+  }
+  .finger-indicator.active .finger-bar-inner {
+    box-shadow: 0 0 8px var(--primary);
+  }
+
+  /* PREDICTION DISPLAY BOX */
+  .prediction-box {
+    margin-top: 16px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1.5px solid rgba(56, 189, 248, 0.2);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.03);
+    transition: all 0.25s ease;
+  }
+
+  .big-prediction-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(20px, 2.6vw, 26px);
+    font-weight: 700;
+    text-align: center;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.3;
+    gap: 10px;
+  }
+
+  .bar-wrap {
+    background: rgba(2, 6, 23, 0.8);
+    border-radius: 999px;
+    height: 12px;
+    overflow: hidden;
+    margin-top: 12px;
+    border: 1px solid var(--border-color);
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #38bdf8, #22c55e);
+    width: 0%;
+    transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 999px;
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  .conf-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  /* DUAL PREDICTION MINI BOXES */
+  .dual-pred-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  @media(max-width: 640px) { .dual-pred-grid { grid-template-columns: 1fr; } }
+
+  .pred-mini-card {
+    border-radius: 14px;
+    padding: 14px;
+    border: 1.5px solid var(--border-color);
+    background: rgba(2, 6, 23, 0.5);
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  .pred-mini-card .who {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .pred-mini-card .what {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    min-height: 26px;
+  }
+  .pred-mini-card .conf {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .pred-mini-card.winner {
+    border-color: var(--accent);
+    background: rgba(34, 197, 94, 0.1);
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.15);
+  }
+  .pred-mini-card.winner.online {
+    border-color: var(--primary);
+    background: rgba(56, 189, 248, 0.1);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+  }
+
+  /* STEPS LIST */
+  .steps-list {
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .step-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .step-badge {
+    counter-increment: step;
+    flex-shrink: 0;
+    background: rgba(56, 189, 248, 0.12);
+    color: var(--primary);
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 14px;
+    border: 1.5px solid rgba(56, 189, 248, 0.25);
+  }
+  .step-badge::before { content: counter(step); }
+  .step-text { font-size: 14px; line-height: 1.5; color: #e2e8f0; }
+
+  /* STATS & THUMBNAILS */
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .stat-row span { color: var(--text-muted); font-size: 14px; }
+  .stat-row b { font-family: 'Space Grotesk', sans-serif; font-size: 18px; }
+
+  #classesList {
+    max-height: 240px;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-top: 10px;
+  }
+  #classesList::-webkit-scrollbar { width: 5px; }
+  #classesList::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px; }
+
+  .class-item-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: rgba(2, 6, 23, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-top: 8px;
+  }
+  .class-item-card strong { font-size: 15px; text-transform: capitalize; }
+
+  .badge-pill {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .example-thumbs-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    min-height: 10px;
+  }
+  .example-thumb-wrapper {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+  .example-thumb-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* LEARNING LOG */
+  #learningLog {
+    max-height: 160px;
+    overflow-y: auto;
+    background: rgba(2, 6, 23, 0.7);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 13px;
+    font-family: monospace;
+    margin-top: 12px;
+  }
+  #learningLog::-webkit-scrollbar { width: 5px; }
+  #learningLog::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px; }
+
+  .log-line {
+    padding: 4px 0;
+    color: #cbd5e1;
+    display: flex;
+    gap: 8px;
+  }
+  .log-line::before { content: "▸"; color: var(--primary); }
+
+  /* DANGER ZONE */
+  .danger-zone {
+    border: 1.5px solid rgba(248, 113, 113, 0.25);
+    background: rgba(239, 68, 68, 0.04);
+    padding: 16px;
+    border-radius: var(--radius-md);
+    margin-top: 20px;
+  }
+
+  /* SEARCH PANEL */
+  .search-status-box {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(2, 6, 23, 0.6);
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    min-height: 44px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+  .search-status-box.show { display: flex; }
+
+  .known-chips-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .known-chip {
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+
+  .hidden-panel { display: none !important; }
+
+  footer {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: var(--text-muted);
+    padding: 10px 20px 40px;
+    font-size: 13.5px;
+    line-height: 1.8;
+  }
+  .kbd {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-color);
+    border-bottom-width: 2px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
 </style>
 </head>
 <body>
+
 <header>
-  <div class="logo"><div class="logoIcon">✋</div><div style="text-align:left"><span>Crouton Alpha</span><small>FEIRA DE CIÊNCIAS • 2026</small></div></div>
-  <h1>IA que <span class="grad">Aprende Gestos</span><br>na Hora!</h1>
-  <p class="sub">Ensine um gesto com a mão e veja a inteligência artificial aprender — e adivinhar em tempo real, na frente dos visitantes.</p>
-  <div class="badges">
-    <span class="badge">📷 Webcam ao vivo</span>
-    <span class="badge">🧠 Machine Learning no navegador</span>
-    <span class="badge">🔄 Reset entre grupos</span>
-    <span class="badge">⚡ 100% local</span>
+  <div class="header-badge">
+    <div class="logo-icon">✋</div>
+    <div style="text-align:left">
+      <span>Crouton Alpha 2.0</span>
+      <small>FEIRA DE CIÊNCIAS • 2026</small>
+    </div>
+  </div>
+  <h1>IA que <span class="grad-cyan">Aprende Gestos</span><br><span class="grad-green">em Tempo Real!</span></h1>
+  <p class="sub">Ensine um gesto com a mão e veja o algoritmo de IA de alta precisão aprender e adivinhar ao vivo na frente dos visitantes.</p>
+
+  <div class="badges-row">
+    <span class="tag-pill">📷 Visão Computacional 3D</span>
+    <span class="tag-pill">⚡ KNN Ponderado + Vetor de Ângulos</span>
+    <span class="tag-pill">🧠 Filtro Temporal Suave</span>
+    <span class="tag-pill">🔒 100% Local no Navegador</span>
   </div>
 </header>
 
-<!-- ===== SELETOR DE IA ===== -->
-<div style="max-width:1180px;margin:14px auto 0;padding:0 18px;position:relative;z-index:1">
+<!-- SELETOR DE MODO DA IA -->
+<div class="ia-selector-container">
   <div class="card">
-    <h2><span class="dot"></span> 🤖 Escolha a IA</h2>
-    <div class="iaSelector">
-      <div class="iaCard active" id="iaLocal">
-        <div class="iaCheck">✓ ATIVA</div>
-        <div class="iaCardTop"><div class="iaIcon local">🏫</div><div><h3>IA Local</h3></div></div>
-        <p>Só aprende com o que <b>você mostra</b> na hora, na frente dela. Começa zerada e vai aprendendo gesto por gesto — perfeita para mostrar o <b>processo de aprendizado</b>.</p>
-        <span class="iaTag"><span class="pulseDot"></span>OFFLINE • aprende só com você</span>
+    <div class="card-header">
+      <h2 class="card-title"><span class="dot-indicator"></span> 🤖 Selecione o Modo da IA</h2>
+      <button class="btn-ghost" id="btnSoundToggle" style="padding:6px 14px; font-size:12px; flex:0 0 auto">🔊 Som: LIGADO</button>
+    </div>
+    <div class="ia-grid">
+      <div class="ia-card active" id="iaLocal">
+        <div class="ia-badge-active">✓ ATIVA</div>
+        <div class="ia-top">
+          <div class="ia-icon local">🏫</div>
+          <div><h3>IA Local (Aprendizado do Zero)</h3></div>
+        </div>
+        <p>Aprende <b>somente com o que você mostra</b> na hora. Começa zerada e demonstra visualmente o processo de coleta de dados e treinamento KNN.</p>
+        <span class="ia-tag"><span class="pulse-dot"></span>OFFLINE • Treinamento Dinâmico</span>
       </div>
-      <div class="iaCard online" id="iaOnline">
-        <div class="iaCheck">✓ ATIVA</div>
-        <div class="iaCardTop"><div class="iaIcon online">🌐</div><div><h3>IA Conectada</h3></div></div>
-        <p>Já <b>pesquisou na internet</b> e sabe os gestos clássicos (joinha, paz, ok…). Você pede um gesto, ela pesquisa e aprende sozinha. Também pode ensinar gestos novos.</p>
-        <span class="iaTag"><span class="pulseDot" style="background:#38bdf8"></span>ONLINE • já sabe pesquisar</span>
+
+      <div class="ia-card online" id="iaOnline">
+        <div class="ia-badge-active">✓ ATIVA</div>
+        <div class="ia-top">
+          <div class="ia-icon online">🌐</div>
+          <div><h3>IA Conectada (Conhecimento Prévio)</h3></div>
+        </div>
+        <p>Já possui uma biblioteca pré-treinada de gestos clássicos (joinha, paz, ok, Libras…). Você pode pedir novos gestos ou ensinar novos!</p>
+        <span class="ia-tag"><span class="pulse-dot" style="background:#38bdf8"></span>ONLINE • Pesquisa + Biblioteca</span>
       </div>
     </div>
-    <p class="small" style="margin:0">👆 Toque em uma IA para trocar. As duas veem a mesma câmera — só muda <b style="color:var(--text)">como elas aprendem</b>.</p>
   </div>
 </div>
 
 <main>
-  <!-- LEFT -->
+  <!-- ESQUERDA: CÂMERA & VISUALIZAÇÃO DA IA -->
   <section class="card">
-    <h2><span class="dot"></span> Câmera ao vivo</h2>
+    <div class="card-header">
+      <h2 class="card-title"><span class="dot-indicator"></span> Câmera e Análise Visão 3D</h2>
+    </div>
+
     <div id="videoWrap">
       <video id="video" playsinline muted></video>
       <canvas id="canvas"></canvas>
-      <div id="liveBadge"><i></i> AO VIVO</div>
-      <div id="overlayStatus">Aguardando câmera…</div>
-    </div>
-    <div class="row" style="margin-top:14px">
-      <button class="btn-primary" id="btnCamera">📷 Ligar câmera</button>
-      <button class="btn-ghost" id="btnPhoto" disabled>📸 Capturar exemplo</button>
-    </div>
-    <p class="small hint">Ligue a câmera, faça o gesto, clique em <b style="color:var(--text)">Capturar exemplo</b>. Repita várias vezes e depois teste a adivinhação!</p>
-
-    <!-- PREDIÇÃO IA LOCAL -->
-    <div class="predictionBox" id="predLocalBox">
-      <div id="bigPrediction">🤖 IA Local: ainda não aprendi nada… ensine um gesto!</div>
-      <div class="barWrap"><div class="bar" id="confBar"></div></div>
-      <div id="confText">Confiança: —</div>
+      <div id="flashOverlay"></div>
+      <div id="liveBadge"><i class="pulse-dot"></i> WEBCAM AO VIVO</div>
+      <div id="overlayStatus">Aguardando ativação da câmera…</div>
     </div>
 
-    <!-- PREDIÇÃO IA CONECTADA -->
-    <div class="predictionBox hiddenPanel" id="predOnlineBox" style="border-color:rgba(56,189,248,.22);background:rgba(56,189,248,.05)">
-      <div id="bigPredictionOnline" style="font-family:'Space Grotesk',sans-serif;font-size:clamp(18px,2.4vw,24px);font-weight:700;text-align:center;min-height:58px;display:flex;align-items:center;justify-content:center;line-height:1.3">🌐 IA Conectada: já pesquisei e sei alguns gestos! Faça um deles 👇</div>
-      <div class="barWrap"><div class="bar" id="confBarOnline" style="background:linear-gradient(90deg,#38bdf8,#a78bfa)"></div></div>
-      <div id="confTextOnline" style="text-align:center;margin-top:8px;font-size:13px;color:var(--muted);font-weight:600">Confiança: —</div>
-      <div class="knownList" id="knownList"></div>
+    <div class="btn-row" style="margin-top: 16px;">
+      <button class="btn-primary" id="btnCamera">📷 Ligar Câmera</button>
+      <button class="btn-ghost" id="btnPhoto" disabled>📸 Capturar Exemplo (E)</button>
     </div>
 
-    <!-- COMPARAÇÃO AO VIVO -->
-    <div class="dualPred" id="dualPred" style="display:none">
-      <div class="predMini" id="miniLocal"><div class="who">🏫 IA Local</div><div class="what">—</div><div class="conf">—</div></div>
-      <div class="predMini" id="miniOnline"><div class="who">🌐 IA Conectada</div><div class="what">—</div><div class="conf">—</div></div>
+    <!-- RADAR VISUAL DOS DEDOS -->
+    <div class="hand-radar-box">
+      <div class="finger-indicator" id="indThumb"><div class="finger-bar-outer"><div class="finger-bar-inner"></div></div>Polegar</div>
+      <div class="finger-indicator" id="indIndex"><div class="finger-bar-outer"><div class="finger-bar-inner"></div></div>Indicador</div>
+      <div class="finger-indicator" id="indMiddle"><div class="finger-bar-outer"><div class="finger-bar-inner"></div></div>Médio</div>
+      <div class="finger-indicator" id="indRing"><div class="finger-bar-outer"><div class="finger-bar-inner"></div></div>Anelar</div>
+      <div class="finger-indicator" id="indPinky"><div class="finger-bar-outer"><div class="finger-bar-inner"></div></div>Mínimo</div>
     </div>
 
-    <div class="dangerZone">
-      <b>⚙️ Reset para o próximo grupo</b>
-      <p class="small" style="margin:8px 0 12px">Apaga tudo que a IA aprendeu (exemplos e classes). Use entre uma apresentação e outra para começar do zero.</p>
-      <button class="btn-danger" id="btnReset">🧹 Resetar conhecimento da IA</button>
+    <!-- PAINEL PREDIÇÃO IA LOCAL -->
+    <div class="prediction-box" id="predLocalBox">
+      <div class="big-prediction-title" id="bigPrediction">🤖 IA Local: aguardando exemplos… ensine um gesto!</div>
+      <div class="bar-wrap"><div class="bar-fill" id="confBar"></div></div>
+      <div class="conf-info">
+        <span id="confText">Confiança: —</span>
+        <span id="qualityText">Qualidade do Sinal: OK</span>
+      </div>
+    </div>
+
+    <!-- PAINEL PREDIÇÃO IA CONECTADA -->
+    <div class="prediction-box hidden-panel" id="predOnlineBox" style="border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.05);">
+      <div class="big-prediction-title" id="bigPredictionOnline">🌐 IA Conectada: faça um gesto pré-treinado!</div>
+      <div class="bar-wrap"><div class="bar-fill" id="confBarOnline" style="background: linear-gradient(90deg, #38bdf8, #a78bfa);"></div></div>
+      <div class="conf-info">
+        <span id="confTextOnline">Confiança: —</span>
+        <span>Pesquisado na Internet ✓</span>
+      </div>
+      <div class="known-chips-list" id="knownList"></div>
+    </div>
+
+    <!-- PAINEL DE COMPARAÇÃO DUPLA -->
+    <div class="dual-pred-grid" id="dualPred" style="display:none">
+      <div class="pred-mini-card" id="miniLocal">
+        <div class="who">🏫 IA Local</div>
+        <div class="what">—</div>
+        <div class="conf">—</div>
+      </div>
+      <div class="pred-mini-card" id="miniOnline">
+        <div class="who">🌐 IA Conectada</div>
+        <div class="what">—</div>
+        <div class="conf">—</div>
+      </div>
+    </div>
+
+    <div class="danger-zone">
+      <b style="display:flex;align-items:center;gap:8px">⚙️ Reiniciar Conhecimento para Novo Grupo</b>
+      <p style="color:var(--text-muted);font-size:13.5px;margin:8px 0 14px">Apaga todos os exemplos coletados nesta sessão para que um novo grupo de visitantes possa ensinar a IA do zero.</p>
+      <button class="btn-danger" id="btnReset">🧹 Resetar Conhecimento da IA (R)</button>
     </div>
   </section>
 
-  <!-- RIGHT -->
-  <section>
+  <!-- DIREITA: ENSINAR & ESTATÍSTICAS -->
+  <section style="display:flex; flex-direction:column; gap:24px;">
+    <!-- CARD COMO ENSINAR -->
     <div class="card">
-      <h2><span class="dot" style="background:#38bdf8"></span> 🎓 Como ensinar a IA</h2>
-      <div class="steps">
-        <div class="step"><div class="stepNum"></div><div>Digite o <b>nome do gesto</b> (ex.: <i>joinha</i>, <i>paz</i>, <i>ok</i>).</div></div>
-        <div class="step"><div class="stepNum"></div><div>Faça o gesto na frente da câmera e clique em <b>Capturar exemplo</b>. Repita <b>5 a 10 vezes</b>, mudando a posição.</div></div>
-        <div class="step"><div class="stepNum"></div><div>Ensine outros gestos com nomes diferentes.</div></div>
-        <div class="step"><div class="stepNum"></div><div>Agora faça um gesto e veja o que a IA <b>adivinha</b> em tempo real!</div></div>
+      <div class="card-header">
+        <h2 class="card-title"><span class="dot-indicator" style="background:#38bdf8"></span> 🎓 Como Ensinar a IA</h2>
       </div>
 
-      <!-- PESQUISAR NA INTERNET (só IA Conectada) -->
-      <div id="searchPanel" class="hiddenPanel" style="margin-bottom:16px">
-        <label class="label" for="searchInput">🔍 Peça um gesto — a IA vai pesquisar na internet</label>
-        <div class="searchRow">
-          <input type="text" id="searchInput" placeholder="Ex.: eu te amo (Libras), número 3, arrasou…">
+      <div class="steps-list">
+        <div class="step-item"><div class="step-badge"></div><div class="step-text">Digite o <b>nome do gesto</b> (ex.: <i>joinha</i>, <i>paz</i>, <i>ok</i>, <i>coração</i>).</div></div>
+        <div class="step-item"><div class="step-badge"></div><div class="step-text">Faça o gesto na câmera e clique em <b>Capturar exemplo</b> (ou aperte a tecla <span class="kbd">E</span>).</div></div>
+        <div class="step-item"><div class="step-badge"></div><div class="step-text">Repita <b>5 a 8 vezes</b> variando ligeiramente o ângulo da mão para máxima precisão.</div></div>
+        <div class="step-item"><div class="step-badge"></div><div class="step-text">Ensine outros gestos e veja a IA adivinhar em tempo real com alta precisão!</div></div>
+      </div>
+
+      <!-- PESQUISAR NA INTERNET (MODO CONECTADO) -->
+      <div id="searchPanel" class="hidden-panel" style="margin-bottom: 20px;">
+        <label class="input-label" for="searchInput">🔍 Peça um gesto — a IA vai pesquisar na biblioteca</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="searchInput" placeholder="Ex.: joinha, paz, ok, coração, roque, L, shaka…">
           <button class="btn-blue" id="btnSearch" style="flex:0 0 auto">🌐 Pesquisar</button>
         </div>
-        <div class="searchStatus" id="searchStatus"></div>
-        <p class="small hint" style="margin-top:8px">A IA Conectada pesquisa na internet, aprende o gesto e mostra como fazer. Depois ela reconhece na hora! 💡 <i>Na feira, use gestos clássicos que ela já conhece: joinha, paz, ok, coração, tchau, eu te amo…</i></p>
+        <div class="search-status-box" id="searchStatus"></div>
       </div>
 
-      <label class="label" for="labelInput">🏷️ Nome do gesto</label>
+      <label class="input-label" for="labelInput">🏷️ Nome do Gesto</label>
       <input type="text" id="labelInput" placeholder="Ex.: joinha, paz, ok, coração, tchau" maxlength="40">
-      <div class="row" style="margin-top:12px">
-        <button class="btn-blue" id="btnTeach">➕ Ensinar este gesto</button>
+
+      <div style="margin-top: 14px;">
+        <button class="btn-blue" id="btnTeach" style="width:100%">➕ Ensinar este gesto (Atalho: E)</button>
       </div>
-      <p class="small hint" id="teachHint">💡 Quanto mais exemplos variados, melhor a IA aprende. Tente perto, longe, virando a mão um pouco!</p>
-      <div class="exampleThumbs" id="thumbs"></div>
+
+      <p style="color:var(--text-muted);font-size:13px;margin-top:10px" id="teachHint">
+        💡 <b>Dica de IA:</b> Quanto mais variação nos exemplos (perto/longe, leve inclinação), mais inteligente o modelo fica!
+      </p>
+
+      <div class="example-thumbs-grid" id="thumbs"></div>
     </div>
 
-    <div class="card" style="margin-top:18px">
-      <h2><span class="dot" style="background:#a78bfa"></span> 🧠 O que a IA aprendeu?</h2>
-      <div class="stat"><span>Classes (gestos)</span><b id="statClasses">0</b></div>
-      <div class="stat"><span>Total de exemplos</span><b id="statExamples">0</b></div>
-      <div class="stat" style="border-bottom:0"><span>Status do modelo</span><b id="statModel" style="font-size:14px">aguardando exemplos</b></div>
-      <div id="classesList" style="margin-top:8px"></div>
-      <p class="small" style="margin-top:14px;margin-bottom:0">Registro de aprendizado:</p>
+    <!-- CARD ESTATÍSTICAS DO MODELO -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title"><span class="dot-indicator" style="background:#a78bfa"></span> 🧠 Painel de Aprendizado da IA</h2>
+      </div>
+
+      <div class="stat-row"><span>Gestos Aprendidos (Classes)</span><b id="statClasses">0</b></div>
+      <div class="stat-row"><span>Total de Exemplos Coletados</span><b id="statExamples">0</b></div>
+      <div class="stat-row" style="border-bottom:0"><span>Status do Algoritmo KNN</span><b id="statModel" style="font-size:14px;color:var(--primary)">Aguardando dados…</b></div>
+
+      <div id="classesList"></div>
+
+      <p style="color:var(--text-muted);font-size:13px;margin-top:16px;margin-bottom:6px;font-weight:700">Console de Eventos da IA:</p>
       <div id="learningLog"></div>
     </div>
   </section>
 </main>
 
 <footer>
-  Feito com MediaPipe Hands + KNN — nada sai do seu computador.
-  <div class="divider"></div>
-  Atalhos: <span class="kbd">E</span> ensinar &nbsp; <span class="kbd">R</span> reset &nbsp; <span class="kbd">C</span> câmera &nbsp; <span class="kbd">1</span> IA Local &nbsp; <span class="kbd">2</span> IA Conectada
+  Desenvolvido para Feira de Ciências 2026 • Visão Computacional com MediaPipe Hands + KNN Geométrico 3D.
+  <div style="width:60px;height:1px;background:rgba(255,255,255,0.15);margin:16px auto"></div>
+  Atalhos de Teclado: <span class="kbd">E</span> Ensinar gesto &nbsp;|&nbsp; <span class="kbd">R</span> Reset &nbsp;|&nbsp; <span class="kbd">C</span> Câmera &nbsp;|&nbsp; <span class="kbd">1</span> IA Local &nbsp;|&nbsp; <span class="kbd">2</span> IA Conectada
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 <script>
-// ===== Estado =====
+// ==========================================
+// SINTETIZADOR DE ÁUDIO SIMPLES (WEBAUDIO)
+// ==========================================
+let soundEnabled = true;
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+  if (!soundEnabled || audioCtx.state === 'suspended') {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+  }
+  if (!soundEnabled) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'capture') {
+      osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.12);
+    } else if (type === 'reset') {
+      osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+      osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.2);
+    } else if (type === 'search') {
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.18);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.18);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.18);
+    }
+  } catch(e){}
+}
+
+document.getElementById('btnSoundToggle').addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+  document.getElementById('btnSoundToggle').textContent = soundEnabled ? '🔊 Som: LIGADO' : '🔇 Som: DESLIGADO';
+});
+
+// ==========================================
+// ESTADO E VARIÁVEIS GLOBAIS
+// ==========================================
 let activeIA = 'local'; // 'local' | 'online'
-
-// IA LOCAL: só aprende com o que você mostra
-let examplesLocal = [];
-let classesLocal = new Set();
-
-// IA CONECTADA: já sabe gestos clássicos (pesquisou na internet!) + aprende novos
-let examplesOnline = [];
-let classesOnline = new Set();
-let searchedGestures = new Set(); // gestos "pesquisados na internet" nesta sessão
-
 let cameraOn = false;
 let lastHand = null;
 let teaching = false;
 
-// ===== BIBLIOTECA DE GESTOS DA INTERNET =====
-// A IA Conectada "pesquisou na internet" e conhece estes gestos clássicos.
-// Cada gesto é descrito pelo estado dos dedos (dobrado=0, esticado=1) e polegar.
-// Usamos isso como exemplos de referência para o KNN.
+// IA LOCAL
+let examplesLocal = [];
+let classesLocal = new Set();
+
+// IA CONECTADA
+let examplesOnline = [];
+let classesOnline = new Set();
+let searchedGestures = new Set();
+
+// SUAVIZAÇÃO TEMPORAL (SMOOTHING BUFFER)
+const predictionBufferLocal = [];
+const predictionBufferOnline = [];
+const BUFFER_SIZE = 4;
+
+// ==========================================
+// BIBLIOTECA DE GESTOS DA INTERNET (3D ACCURATE)
+// ==========================================
 const INTERNET_GESTURES = [
-  { name:'joinha', emoji:'👍', desc:'Polegar para cima, outros dedos fechados', fingers:{thumb:1,index:0,middle:0,ring:0,pinky:0} },
-  { name:'paz', emoji:'✌️', desc:'Indicador e médio levantados (em V)', fingers:{thumb:0,index:1,middle:1,ring:0,pinky:0} },
-  { name:'ok', emoji:'👌', desc:'Indicador e polegar formando um círculo', fingers:{thumb:1,index:1,middle:0,ring:0,pinky:0} },
-  { name:'coração', emoji:'🤟', desc:'Polegar e indicador cruzados', fingers:{thumb:1,index:1,middle:0,ring:0,pinky:0} },
-  { name:'tchau', emoji:'👋', desc:'Todos os dedos abertos, mão aberta', fingers:{thumb:1,index:1,middle:1,ring:1,pinky:1} },
-  { name:'eu te amo (Libras)', emoji:'🤟✊✌️', desc:'Polegar, indicador e mínimo levantados', fingers:{thumb:1,index:1,middle:0,ring:0,pinky:1} },
-  { name:'número 3', emoji:'🤟', desc:'Polegar, indicador e médio levantados', fingers:{thumb:1,index:1,middle:1,ring:0,pinky:0} },
-  { name:'número 2', emoji:'✌️', desc:'Indicador e médio em V (igual paz)', fingers:{thumb:0,index:1,middle:1,ring:0,pinky:0} },
-  { name:'apontando', emoji:'👉', desc:'Indicador esticado, resto fechado', fingers:{thumb:0,index:1,middle:0,ring:0,pinky:0} },
-  { name:'punho fechado', emoji:'✊', desc:'Todos os dedos dobrados', fingers:{thumb:0,index:0,middle:0,ring:0,pinky:0} },
-  { name:'mão aberta', emoji:'🖐️', desc:'Todos os dedos abertos', fingers:{thumb:1,index:1,middle:1,ring:1,pinky:1} },
-  { name:'joinha pra baixo', emoji:'👎', desc:'Polegar para baixo', fingers:{thumb:1,index:0,middle:0,ring:0,pinky:0} },
-  { name:'arrasou', emoji:'🙌', desc:'Mão aberta, dedos esticados', fingers:{thumb:1,index:1,middle:1,ring:1,pinky:1} },
-  { name:'like', emoji:'👍', desc:'Polegar para cima', fingers:{thumb:1,index:0,middle:0,ring:0,pinky:0} },
+  { name: 'joinha', emoji: '👍', desc: 'Polegar para CIMA, outros 4 dedos fechados', fingerState: [1,0,0,0,0], thumbDir: 'up' },
+  { name: 'joinha pra baixo', emoji: '👎', desc: 'Polegar para BAIXO, outros 4 dedos fechados', fingerState: [1,0,0,0,0], thumbDir: 'down' },
+  { name: 'paz', emoji: '✌️', desc: 'Indicador e Médio levantados em V', fingerState: [0,1,1,0,0], thumbDir: 'neutral' },
+  { name: 'ok', emoji: '👌', desc: 'Indicador encostando no Polegar, os outros 3 esticados', fingerState: [1,1,1,1,1], touchIndexThumb: true, thumbDir: 'neutral' },
+  { name: 'coração', emoji: '🤟', desc: 'Polegar e Indicador cruzados formando um mini coração', fingerState: [1,1,0,0,0], touchIndexThumb: true, thumbDir: 'neutral' },
+  { name: 'tchau / mão aberta', emoji: '👋', desc: 'Todos os 5 dedos esticados e abertos', fingerState: [1,1,1,1,1], thumbDir: 'neutral' },
+  { name: 'roque / metal', emoji: '🤘', desc: 'Indicador e Mínimo esticados, Médio e Anelar fechados', fingerState: [0,1,0,0,1], thumbDir: 'neutral' },
+  { name: 'eu te amo (Libras)', emoji: '🤟', desc: 'Polegar, Indicador e Mínimo esticados', fingerState: [1,1,0,0,1], thumbDir: 'neutral' },
+  { name: 'apontando', emoji: '👉', desc: 'Indicador esticado, outros dedos fechados', fingerState: [0,1,0,0,0], thumbDir: 'neutral' },
+  { name: 'punho fechado', emoji: '✊', desc: 'Todos os 5 dedos fechados', fingerState: [0,0,0,0,0], thumbDir: 'neutral' },
+  { name: 'número 3', emoji: '🤟', desc: 'Polegar, Indicador e Médio levantados', fingerState: [1,1,1,0,0], thumbDir: 'neutral' },
+  { name: 'arma / pistol', emoji: '👉', desc: 'Polegar e Indicador formando um L de 90°', fingerState: [1,1,0,0,0], thumbDir: 'up' },
+  { name: 'shaka / hang loose', emoji: '🤙', desc: 'Polegar e Mínimo esticados nas pontas', fingerState: [1,0,0,0,1], thumbDir: 'neutral' }
 ];
 
-// Gera exemplos sintéticos a partir de uma descrição de dedos (para a IA Conectada)
-// Cria variações pequenas para o KNN ter referências
-function synthExampleFromFingers(fingers){
-  // Heurística: nosso extrator real de features usa posições 3D, então
-  // para a IA Conectada comparamos pelo estado dos dedos detectado.
-  return { fingers };
-}
+// ==========================================
+// EXTRATOR DE FEATURES GEOMÉTRICAS 3D
+// ==========================================
+// Calcula:
+// 1. Flexão/extensão contínua dos 5 dedos (0.0 = dobrado, 1.0 = esticado)
+// 2. Ângulos das articulações inter-falângicas (MCP-PIP-DIP)
+// 3. Direção do polegar (para cima vs para baixo)
+// 4. Distâncias relativas normalizadas da palma da mão aos dedos
+function extractAdvancedFeatures(hand) {
+  const wrist = hand[0];
+  const mcps = [1, 5, 9, 13, 17];
+  const pips = [2, 6, 10, 14, 18];
+  const tips = [4, 8, 12, 16, 20];
 
-function fingersOfHand(hand){
-  // hand: 21 landmarks. Calcula se cada dedo está esticado pela distância
-  // entre a ponta (palm) e a base, em relação ao punho.
-  const wrist=hand[0];
-  const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z);
-  const tips=[4,8,12,16,20]; // polegar, indicador, médio, anelar, mínimo
-  const bases=[2,5,9,13,17];
-  const out={};
-  const names=['thumb','index','middle','ring','pinky'];
-  for(let i=0;i<5;i++){
-    const d=dist(hand[tips[i]],hand[bases[i]]);
-    // Se ponta está longe da base -> dedo esticado
-    out[names[i]] = d > 0.08 ? 1 : 0;
+  // Escala de referência: distância Wrist -> MCP Médio (Landmark 9)
+  const scale = Math.hypot(hand[9].x - wrist.x, hand[9].y - wrist.y, (hand[9].z||0) - (wrist.z||0)) || 1.0;
+
+  const fingerExtensions = [];
+  const jointAngles = [];
+  const normalizedLandmarks = [];
+
+  // 1. Flexão Contínua dos 5 Dedos
+  for (let i = 0; i < 5; i++) {
+    const tipDist = Math.hypot(hand[tips[i]].x - wrist.x, hand[tips[i]].y - wrist.y, (hand[tips[i]].z||0) - (wrist.z||0));
+    const mcpDist = Math.hypot(hand[mcps[i]].x - wrist.x, hand[mcps[i]].y - wrist.y, (hand[mcps[i]].z||0) - (wrist.z||0));
+    const ratio = tipDist / mcpDist;
+
+    // Polegar vs Outros Dedos
+    let extScore = 0;
+    if (i === 0) {
+      extScore = Math.max(0, Math.min(1, (ratio - 1.1) / 0.6));
+    } else {
+      extScore = Math.max(0, Math.min(1, (ratio - 1.0) / 0.85));
+    }
+    fingerExtensions.push(extScore);
+
+    // Ângulo MCP -> PIP -> Tip
+    const v1 = { x: hand[pips[i]].x - hand[mcps[i]].x, y: hand[pips[i]].y - hand[mcps[i]].y };
+    const v2 = { x: hand[tips[i]].x - hand[pips[i]].x, y: hand[tips[i]].y - hand[pips[i]].y };
+    const dot = v1.x * v2.x + v1.y * v2.y;
+    const mag1 = Math.hypot(v1.x, v1.y);
+    const mag2 = Math.hypot(v2.x, v2.y);
+    const cosAngle = (mag1 * mag2) > 0 ? dot / (mag1 * mag2) : 1;
+    jointAngles.push(Math.acos(Math.max(-1, Math.min(1, cosAngle))));
   }
-  return out;
+
+  // 2. Direção do Polegar (Up vs Down) em relação à mão
+  const thumbY = hand[4].y - wrist.y; // Em coordenadas de tela, Y cresce para baixo
+  let thumbDirVal = 0; // 0 = neutro, 1 = para cima, -1 = para baixo
+  if (thumbY < -0.2 * scale) thumbDirVal = 1;
+  else if (thumbY > 0.15 * scale) thumbDirVal = -1;
+
+  // 3. Toque entre Indicador e Polegar (ex.: gesto OK)
+  const distIndexThumb = Math.hypot(hand[4].x - hand[8].x, hand[4].y - hand[8].y) / scale;
+  const isTouchOK = distIndexThumb < 0.35 ? 1 : 0;
+
+  // 4. Landmarks 3D normalizados pela escala
+  for (const lm of hand) {
+    normalizedLandmarks.push((lm.x - wrist.x) / scale);
+    normalizedLandmarks.push((lm.y - wrist.y) / scale);
+    normalizedLandmarks.push(((lm.z || 0) - (wrist.z || 0)) / scale);
+  }
+
+  return {
+    fingerExtensions,
+    jointAngles,
+    thumbDirVal,
+    isTouchOK,
+    landmarks: normalizedLandmarks
+  };
 }
 
-function fingerDistance(a,b){
-  const keys=['thumb','index','middle','ring','pinky'];
-  let s=0;
-  for(const k of keys){ s += (a[k]-b[k])**2; }
-  return Math.sqrt(s);
+// Distância geométrica ponderada entre duas observações de mão
+function computeHandDistance(featA, featB) {
+  let dist = 0;
+
+  // 1. Extensão dos Dedos (peso alto = 3.0)
+  for (let i = 0; i < 5; i++) {
+    const diff = featA.fingerExtensions[i] - featB.fingerExtensions[i];
+    dist += 3.0 * (diff * diff);
+  }
+
+  // 2. Ângulos articulares (peso = 2.0)
+  for (let i = 0; i < 5; i++) {
+    const diff = featA.jointAngles[i] - featB.jointAngles[i];
+    dist += 2.0 * (diff * diff);
+  }
+
+  // 3. Direção do Polegar (peso = 2.5)
+  const thumbDiff = featA.thumbDirVal - featB.thumbDirVal;
+  dist += 2.5 * (thumbDiff * thumbDiff);
+
+  // 4. Toque Polegar-Indicador (peso = 2.0)
+  const touchDiff = featA.isTouchOK - featB.isTouchOK;
+  dist += 2.0 * (touchDiff * touchDiff);
+
+  // 5. Posicionamento 3D Geral (peso = 0.5)
+  let lmDist = 0;
+  for (let i = 0; i < featA.landmarks.length; i++) {
+    const d = featA.landmarks[i] - featB.landmarks[i];
+    lmDist += d * d;
+  }
+  dist += 0.5 * Math.sqrt(lmDist);
+
+  return Math.sqrt(dist);
 }
 
-function knnPredictFingers(fingers, exampleSet){
-  if(!exampleSet.length) return null;
-  const sorted=[...exampleSet].map(e=>({label:e.label, d:fingerDistance(fingers,e.fingers)})).sort((a,b)=>a.d-b.d);
-  const k=Math.min(4, sorted.length);
-  const votes={};
-  for(let i=0;i<k;i++){ const l=sorted[i].label; votes[l]=(votes[l]||0)+(k-i); }
-  let best=null,bestScore=-1;
-  for(const [label,score] of Object.entries(votes)){ if(score>bestScore){bestScore=score;best=label;} }
-  const d0=sorted[0].d;
-  const conf=Math.max(5, Math.min(98, Math.round(100 - d0*30)));
-  return {label:best, confidence:conf, nearest:d0};
+// ALGORITMO KNN COM PONDERAÇÃO E MARGEM DE CONFIANÇA
+function knnPredictAdvanced(feat, exampleSet) {
+  if (!exampleSet.length) return null;
+
+  const sorted = exampleSet.map(ex => ({
+    label: ex.label,
+    dist: computeHandDistance(feat, ex.features)
+  })).sort((a, b) => a.dist - b.dist);
+
+  const K = Math.min(5, sorted.length);
+  const votes = {};
+
+  for (let i = 0; i < K; i++) {
+    const item = sorted[i];
+    const weight = 1 / (item.dist + 0.05);
+    votes[item.label] = (votes[item.label] || 0) + weight;
+  }
+
+  let bestLabel = null;
+  let maxVote = -1;
+  let totalVote = 0;
+
+  for (const [label, vote] of Object.entries(votes)) {
+    totalVote += vote;
+    if (vote > maxVote) {
+      maxVote = vote;
+      bestLabel = label;
+    }
+  }
+
+  const d0 = sorted[0].dist;
+  const rawConf = Math.round((maxVote / totalVote) * 100);
+  const distPenalty = Math.max(0, d0 * 12);
+  const confidence = Math.max(10, Math.min(99, Math.round(rawConf - distPenalty)));
+
+  return { label: bestLabel, confidence, distance: d0 };
 }
 
+// SUAVIZAÇÃO TEMPORAL DE PREDIÇÃO (FILTRO MAIORIA)
+function smoothPrediction(pred, buffer) {
+  if (!pred) return null;
+  buffer.push(pred);
+  if (buffer.length > BUFFER_SIZE) buffer.shift();
+
+  const labelCounts = {};
+  let totalConf = 0;
+
+  for (const p of buffer) {
+    labelCounts[p.label] = (labelCounts[p.label] || 0) + 1;
+    totalConf += p.confidence;
+  }
+
+  let bestLabel = pred.label;
+  let maxCount = 0;
+  for (const [lbl, cnt] of Object.entries(labelCounts)) {
+    if (cnt > maxCount) {
+      maxCount = cnt;
+      bestLabel = lbl;
+    }
+  }
+
+  const avgConf = Math.round(totalConf / buffer.length);
+  return { label: bestLabel, confidence: avgConf, distance: pred.distance };
+}
+
+// ==========================================
+// RENDERIZAÇÃO ESTILIZADA DO CANVAS (NEON 3D)
+// ==========================================
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -467,333 +1270,446 @@ const overlay = document.getElementById('overlayStatus');
 const labelInput = document.getElementById('labelInput');
 const logEl = document.getElementById('learningLog');
 
-function log(msg){
-  const d=document.createElement('div'); d.className='logLine'; d.textContent=new Date().toLocaleTimeString('pt-BR')+' — '+msg;
+function log(msg) {
+  const d = document.createElement('div');
+  d.className = 'log-line';
+  d.textContent = `${new Date().toLocaleTimeString('pt-BR')} — ${msg}`;
   logEl.prepend(d);
 }
 
-// ===== MediaPipe Hands =====
-const hands = new Hands({locateFile: f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
-hands.setOptions({maxNumHands:1, modelComplexity:0, minDetectionConfidence:.5, minTrackingConfidence:.5});
+// MEDIAPIPE HANDS SETUP
+const hands = new Hands({
+  locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+});
+hands.setOptions({
+  maxNumHands: 1,
+  modelComplexity: 1,
+  minDetectionConfidence: 0.6,
+  minTrackingConfidence: 0.6
+});
 hands.onResults(onResults);
 
-function onResults(res){
-  const w=canvas.width=video.videoWidth||640;
-  const h=canvas.height=video.videoHeight||480;
-  ctx.clearRect(0,0,w,h);
-  if(res.multiHandLandmarks && res.multiHandLandmarks.length){
-    lastHand=res.multiHandLandmarks[0];
-    for(const lm of lastHand){
-      ctx.beginPath(); ctx.arc(lm.x*w, lm.y*h, 4, 0, Math.PI*2);
-      ctx.fillStyle='#38bdf8'; ctx.fill();
+const FINGER_COLORS = ['#f59e0b', '#38bdf8', '#6366f1', '#a855f7', '#ec4899'];
+const PALM_CONNECTIONS = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+
+function onResults(res) {
+  const w = canvas.width = video.videoWidth || 640;
+  const h = canvas.height = video.videoHeight || 480;
+  ctx.clearRect(0, 0, w, h);
+
+  if (res.multiHandLandmarks && res.multiHandLandmarks.length) {
+    lastHand = res.multiHandLandmarks[0];
+
+    // Desenhar Conexões com Efeito Neon
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = '#38bdf8';
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.85)';
+    ctx.lineWidth = 3;
+
+    for (const [a, b] of PALM_CONNECTIONS) {
+      ctx.beginPath();
+      ctx.moveTo(lastHand[a].x * w, lastHand[a].y * h);
+      ctx.lineTo(lastHand[b].x * w, lastHand[b].y * h);
+      ctx.stroke();
     }
-    ctx.strokeStyle='rgba(255,255,255,.75)'; ctx.lineWidth=2;
-    const pairs=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
-    for(const [a,b] of pairs){
-      ctx.beginPath(); ctx.moveTo(lastHand[a].x*w,lastHand[a].y*h); ctx.lineTo(lastHand[b].x*w,lastHand[b].y*h); ctx.stroke();
+
+    // Desenhar Pontos das Articulações
+    for (let i = 0; i < lastHand.length; i++) {
+      const lm = lastHand[i];
+      const fingerIdx = i === 0 ? 0 : Math.floor((i - 1) / 4);
+      const color = FINGER_COLORS[fingerIdx] || '#38bdf8';
+
+      ctx.beginPath();
+      ctx.arc(lm.x * w, lm.y * h, (i % 4 === 0) ? 6 : 4, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 10;
+      ctx.fill();
+
+      // Anel Pulsante nos Dedos (Pontas 4, 8, 12, 16, 20)
+      if ([4, 8, 12, 16, 20].includes(i)) {
+        ctx.beginPath();
+        ctx.arc(lm.x * w, lm.y * h, 9, 0, Math.PI * 2);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
     }
-    if(!teaching) predict();
-    overlay.textContent='✋ mão detectada! '+(teaching?'APRENDENDO…':'testando…');
-  }else{
-    lastHand=null;
-    overlay.textContent='🖐️ mostre sua mão na câmera';
+    ctx.shadowBlur = 0; // Reset
+
+    // Atualizar Radar Visual de Dedos
+    const feats = extractAdvancedFeatures(lastHand);
+    updateFingerRadar(feats.fingerExtensions);
+
+    if (!teaching) predict();
+    overlay.textContent = '✋ Mão Detectada em Tempo Real! ' + (teaching ? 'APRENDENDO…' : 'Analisando gestos…');
+  } else {
+    lastHand = null;
+    overlay.textContent = '🖐️ Posicione sua mão na câmera para iniciar';
+    resetFingerRadar();
   }
 }
 
-let camera=null;
-async function startCamera(){
-  try{
-    camera = new Camera(video, {onFrame: async()=>{ await hands.send({image:video}); }, width:640, height:480, facingMode:'user'});
+function updateFingerRadar(exts) {
+  const ids = ['indThumb', 'indIndex', 'indMiddle', 'indRing', 'indPinky'];
+  exts.forEach((ext, i) => {
+    const el = document.getElementById(ids[i]);
+    if (el) {
+      const inner = el.querySelector('.finger-bar-inner');
+      const pct = Math.round(ext * 100);
+      inner.style.height = pct + '%';
+      if (pct > 50) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+  });
+}
+
+function resetFingerRadar() {
+  const ids = ['indThumb', 'indIndex', 'indMiddle', 'indRing', 'indPinky'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.querySelector('.finger-bar-inner').style.height = '0%';
+      el.classList.remove('active');
+    }
+  });
+}
+
+// INICIAR CÂMERA
+let camera = null;
+async function startCamera() {
+  try {
+    camera = new Camera(video, {
+      onFrame: async () => { await hands.send({ image: video }); },
+      width: 640,
+      height: 480,
+      facingMode: 'user'
+    });
     await camera.start();
-    cameraOn=true;
-    document.getElementById('btnPhoto').disabled=false;
-    overlay.textContent='Câmera ligada! mostre sua mão 👉';
-    log('Câmera ligada.');
-  }catch(e){ alert('Não consegui abrir a câmera: '+e.message); }
-}
-
-function extractFeatures(hand){
-  const wrist=hand[0];
-  const midDist = Math.hypot(hand[9].x-wrist.x, hand[9].y-wrist.y) || 1;
-  const feats=[];
-  for(const lm of hand){
-    feats.push((lm.x-wrist.x)/midDist);
-    feats.push((lm.y-wrist.y)/midDist);
-    feats.push(((lm.z||0)-(wrist.z||0))/midDist);
+    cameraOn = true;
+    document.getElementById('btnPhoto').disabled = false;
+    overlay.textContent = 'Câmera Ativa! Faça um gesto 👉';
+    log('Câmera ligada com sucesso.');
+  } catch (e) {
+    alert('Erro ao acessar a câmera: ' + e.message);
   }
-  return feats;
 }
 
-function distance(a,b){
-  let s=0; for(let i=0;i<a.length;i++){ const d=a[i]-b[i]; s+=d*d; } return Math.sqrt(s);
-}
+// PREDIÇÃO E RECONHECIMENTO
+let lastPredictAt = 0;
+function predict() {
+  const now = Date.now();
+  if (now - lastPredictAt < 200) return; // 5 FPS limite para suavidade
+  lastPredictAt = now;
+  if (!lastHand) return;
 
-function knnPredict(features){
-  if(examplesLocal.length===0) return null;
-  const sorted=[...examplesLocal].map(e=>({label:e.label, d:distance(features,e.features)})).sort((a,b)=>a.d-b.d);
-  const k=Math.min(5, sorted.length);
-  const votes={};
-  for(let i=0;i<k;i++){ const l=sorted[i].label; votes[l]=(votes[l]||0)+(k-i); }
-  let best=null,bestScore=-1,total=0;
-  for(const [label,score] of Object.entries(votes)){ total+=score; if(score>bestScore){bestScore=score;best=label;} }
-  const d0=sorted[0].d;
-  const conf=Math.max(5, Math.min(98, Math.round(100 - d0*22)));
-  return {label:best, confidence:conf, nearest:d0, votes};
-}
+  const feats = extractAdvancedFeatures(lastHand);
 
-let lastPredictAt=0;
-function predict(){
-  const now=Date.now();
-  if(now-lastPredictAt<350) return;
-  lastPredictAt=now;
-  if(!lastHand) return;
+  // IA LOCAL
+  const rawPredLocal = knnPredictAdvanced(feats, examplesLocal);
+  const resLocal = smoothPrediction(rawPredLocal, predictionBufferLocal);
 
-  const f=extractFeatures(lastHand);
-  const resLocal=knnPredict(f);
-  const fingers=fingersOfHand(lastHand);
-  const resOnline=knnPredictFingers(fingers, examplesOnline);
+  // IA CONECTADA
+  const rawPredOnline = knnPredictAdvanced(feats, examplesOnline);
+  const resOnline = smoothPrediction(rawPredOnline, predictionBufferOnline);
 
-  // IA LOCAL (painel principal)
-  const big=document.getElementById('bigPrediction');
-  const bar=document.getElementById('confBar');
-  const txt=document.getElementById('confText');
-  if(!resLocal){ big.textContent='🤖 IA Local: ainda não aprendi nada… ensine um gesto!'; bar.style.width='0%'; txt.textContent='Confiança: —'; }
-  else{
-    big.textContent=`🤖 IA Local acha que é: "${resLocal.label}"`;
-    bar.style.width=resLocal.confidence+'%';
-    txt.textContent=`Confiança: ${resLocal.confidence}%  •  distância: ${resLocal.nearest.toFixed(2)}`;
+  // Atualizar Interface IA Local
+  const big = document.getElementById('bigPrediction');
+  const bar = document.getElementById('confBar');
+  const txt = document.getElementById('confText');
+
+  if (!resLocal) {
+    big.textContent = '🤖 IA Local: aguardando exemplos… ensine um gesto!';
+    bar.style.width = '0%';
+    txt.textContent = 'Confiança: —';
+  } else {
+    big.innerHTML = `🤖 IA Local reconhece: <span style="color:var(--accent);margin-left:6px">"${resLocal.label}"</span>`;
+    bar.style.width = resLocal.confidence + '%';
+    txt.textContent = `Confiança: ${resLocal.confidence}%  •  Distância Algorítmica: ${resLocal.distance.toFixed(2)}`;
   }
 
-  // IA CONECTADA (painel principal)
-  const bigO=document.getElementById('bigPredictionOnline');
-  const barO=document.getElementById('confBarOnline');
-  const txtO=document.getElementById('confTextOnline');
-  if(!resOnline){ bigO.textContent='🌐 IA Conectada: nenhuma referência ainda…'; barO.style.width='0%'; txtO.textContent='Confiança: —'; }
-  else{
-    const g=INTERNET_GESTURES.find(x=>x.name===resOnline.label);
-    bigO.textContent=`🌐 IA Conectada acha que é: "${g?g.emoji+' ':''}${resOnline.label}"`;
-    barO.style.width=resOnline.confidence+'%';
-    txtO.textContent=`Confiança: ${resOnline.confidence}%  •  pesquisado na internet ✓`;
+  // Atualizar Interface IA Conectada
+  const bigO = document.getElementById('bigPredictionOnline');
+  const barO = document.getElementById('confBarOnline');
+  const txtO = document.getElementById('confTextOnline');
+
+  if (!resOnline) {
+    bigO.textContent = '🌐 IA Conectada: faça um gesto pré-treinado!';
+    barO.style.width = '0%';
+    txtO.textContent = 'Confiança: —';
+  } else {
+    const g = INTERNET_GESTURES.find(x => x.name === resOnline.label);
+    bigO.innerHTML = `🌐 IA Conectada reconhece: <span style="color:var(--primary);margin-left:6px">${g ? g.emoji + ' ' : ''}"${resOnline.label}"</span>`;
+    barO.style.width = resOnline.confidence + '%';
+    txtO.textContent = `Confiança: ${resOnline.confidence}%  •  Modelo Biblioteca 3D ✓`;
   }
 
-  // COMPARAÇÃO (mostra as duas juntas quando ambas têm dados)
-  updateDual(resLocal, resOnline);
+  updateDualComparison(resLocal, resOnline);
 }
 
-function updateDual(resLocal, resOnline){
-  const dual=document.getElementById('dualPred');
-  if(!resLocal && !resOnline){ dual.style.display='none'; return; }
-  dual.style.display='grid';
-  const ml=document.getElementById('miniLocal');
-  const mo=document.getElementById('miniOnline');
+function updateDualComparison(resLocal, resOnline) {
+  const dual = document.getElementById('dualPred');
+  if (!resLocal && !resOnline) { dual.style.display = 'none'; return; }
+  dual.style.display = 'grid';
+
+  const ml = document.getElementById('miniLocal');
+  const mo = document.getElementById('miniOnline');
   ml.classList.remove('winner'); mo.classList.remove('winner');
-  if(resLocal){
-    ml.querySelector('.what').textContent='"'+resLocal.label+'"';
-    ml.querySelector('.conf').textContent=resLocal.confidence+'% • aprendeu com você';
-  }else{
-    ml.querySelector('.what').textContent='ainda não sabe 😶';
-    ml.querySelector('.conf').textContent='ensine um gesto para ela';
+
+  if (resLocal) {
+    ml.querySelector('.what').textContent = `"${resLocal.label}"`;
+    ml.querySelector('.conf').textContent = `${resLocal.confidence}% • Treinado por você`;
+  } else {
+    ml.querySelector('.what').textContent = 'Sem dados';
+    ml.querySelector('.conf').textContent = 'Ensine um gesto';
   }
-  if(resOnline){
-    mo.querySelector('.what').textContent='"'+resOnline.label+'"';
-    mo.querySelector('.conf').textContent=resOnline.confidence+'% • pesquisou na internet';
-  }else{
-    mo.querySelector('.what').textContent='—';
-    mo.querySelector('.conf').textContent='—';
+
+  if (resOnline) {
+    mo.querySelector('.what').textContent = `"${resOnline.label}"`;
+    mo.querySelector('.conf').textContent = `${resOnline.confidence}% • Biblioteca Web`;
+  } else {
+    mo.querySelector('.what').textContent = '—';
+    mo.querySelector('.conf').textContent = '—';
   }
-  // marca quem está mais confiante
-  if(resLocal && resOnline){
-    if(resLocal.confidence>=resOnline.confidence) ml.classList.add('winner');
-    else mo.classList.add('winner');
-  } else if(resLocal){ ml.classList.add('winner'); } else if(resOnline){ mo.classList.add('winner'); }
+
+  if (resLocal && resOnline) {
+    if (resLocal.confidence >= resOnline.confidence) ml.classList.add('winner');
+    else mo.classList.add('winner', 'online');
+  } else if (resLocal) ml.classList.add('winner');
+  else if (resOnline) mo.classList.add('winner', 'online');
 }
 
-function captureThumb(){
-  try{
-    const off=document.createElement('canvas'); off.width=96; off.height=96;
-    const octx=off.getContext('2d');
-    const s=Math.min(video.videoWidth, video.videoHeight);
-    octx.drawImage(video, (video.videoWidth-s)/2, (video.videoHeight-s)/2, s, s, 0,0,96,96);
+// CAPTURA DE THUMBNAIL
+function captureThumb() {
+  try {
+    const off = document.createElement('canvas'); off.width = 96; off.height = 96;
+    const octx = off.getContext('2d');
+    const s = Math.min(video.videoWidth, video.videoHeight);
+    octx.drawImage(video, (video.videoWidth - s) / 2, (video.videoHeight - s) / 2, s, s, 0, 0, 96, 96);
     return off.toDataURL('image/png');
-  }catch(e){ return null; }
+  } catch (e) { return null; }
 }
 
-function teach(){
-  const label=labelInput.value.trim().toLowerCase();
-  if(!label){ alert('Digite o nome do gesto primeiro!'); labelInput.focus(); return; }
-  if(!cameraOn){ alert('Ligue a câmera primeiro!'); return; }
-  if(!lastHand){ alert('Mostre sua mão na câmera antes de ensinar!'); return; }
-  teaching=true;
-  const feats=extractFeatures(lastHand);
-  const fingers=fingersOfHand(lastHand);
-  const thumb=captureThumb();
+// ENSINAR GESTO
+function teach() {
+  const label = labelInput.value.trim().toLowerCase();
+  if (!label) { alert('Por favor, digite o nome do gesto primeiro!'); labelInput.focus(); return; }
+  if (!cameraOn) { alert('Ligue a câmera primeiro!'); return; }
+  if (!lastHand) { alert('Posicione sua mão na câmera antes de capturar!'); return; }
 
-  if(activeIA==='local'){
-    examplesLocal.push({label, features:feats, fingers, thumb});
+  teaching = true;
+  playSound('capture');
+
+  // Efeito Visual Flash na Câmera
+  const flash = document.getElementById('flashOverlay');
+  flash.style.opacity = '0.7';
+  setTimeout(() => { flash.style.opacity = '0'; }, 150);
+
+  const feats = extractAdvancedFeatures(lastHand);
+  const thumb = captureThumb();
+
+  if (activeIA === 'local') {
+    examplesLocal.push({ label, features: feats, thumb });
     classesLocal.add(label);
     log(`🏫 IA Local aprendeu "${label}". Total: ${examplesLocal.length} exemplo(s)`);
-  }else{
-    examplesOnline.push({label, features:feats, fingers, thumb});
+  } else {
+    examplesOnline.push({ label, features: feats, thumb });
     classesOnline.add(label);
-    log(`🌐 IA Conectada aprendeu "${label}" (ensinado). Total: ${examplesOnline.length}`);
+    log(`🌐 IA Conectada aprendeu "${label}" (novo exemplo). Total: ${examplesOnline.length}`);
   }
-  teaching=false;
+
+  teaching = false;
   updateStats();
-  if(thumb){
-    const img=document.createElement('img'); img.src=thumb; img.style.cssText='width:60px;height:60px;border-radius:12px';
-    document.getElementById('thumbs').appendChild(img);
+
+  if (thumb) {
+    const wrap = document.createElement('div');
+    wrap.className = 'example-thumb-wrapper';
+    wrap.innerHTML = `<img src="${thumb}" title="${label}">`;
+    document.getElementById('thumbs').appendChild(wrap);
   }
-  const who = activeIA==='local' ? 'IA Local' : 'IA Conectada';
-  overlay.textContent=`✅ ${who} aprendeu "${label}"!`;
-  // (efeito de confirmação já está no overlay)
-  setTimeout(()=>{ if(lastHand) overlay.textContent='✋ mão detectada! testando…'; },1800);
+
+  const who = activeIA === 'local' ? 'IA Local' : 'IA Conectada';
+  overlay.textContent = `✅ ${who} gravou o exemplo para "${label}"!`;
+  setTimeout(() => { if (lastHand) overlay.textContent = '✋ Mão detectada! Testando…'; }, 1600);
 }
 
-function updateStats(){
-  const isLocal = activeIA==='local';
+// ATUALIZAR PAINEL DE ESTATÍSTICAS
+function updateStats() {
+  const isLocal = activeIA === 'local';
   const examples = isLocal ? examplesLocal : examplesOnline;
   const classes = isLocal ? classesLocal : classesOnline;
-  document.getElementById('statClasses').textContent=classes.size;
-  document.getElementById('statExamples').textContent=examples.length;
-  const el=document.getElementById('statModel');
-  if(isLocal){
-    el.textContent= examples.length>=5 ? 'pronto para adivinhar! 🎉' : (examples.length>0? 'aprendendo… ('+examples.length+'/5 exemplos)' : 'aguardando exemplos');
-  }else{
-    el.textContent= examples.length>=3 ? 'pronto! 🎉' : (examples.length>0? 'aprendendo… ('+examples.length+'/3 exemplos)' : 'já sabe gestos da internet 🎓');
+
+  document.getElementById('statClasses').textContent = classes.size;
+  document.getElementById('statExamples').textContent = examples.length;
+
+  const el = document.getElementById('statModel');
+  if (isLocal) {
+    el.textContent = examples.length >= 5 ? 'Pronto para adivinhar! 🎉' : (examples.length > 0 ? `Aprendendo… (${examples.length}/5)` : 'Aguardando exemplos…');
+  } else {
+    el.textContent = examples.length >= 3 ? 'Pronto com biblioteca! 🎉' : 'Biblioteca ativa 🎓';
   }
-  const list=document.getElementById('classesList');
-  list.innerHTML='';
-  if(classes.size===0){
-    list.innerHTML='<p class="small" style="margin:10px 0">Nenhum gesto aprendido ainda. Ensine um gesto para começar!</p>';
+
+  const list = document.getElementById('classesList');
+  list.innerHTML = '';
+  if (classes.size === 0) {
+    list.innerHTML = '<p style="color:var(--text-muted);font-size:13.5px;margin:10px 0">Nenhum gesto aprendido ainda. Digite um nome e clique em Ensinar!</p>';
     return;
   }
-  const maxN = Math.max(...[...classes].map(l=>examples.filter(e=>e.label===l).length), 5);
-  [...classes].sort().forEach(label=>{
-    const n=examples.filter(e=>e.label===label).length;
-    const pct=Math.min(100, Math.round((n/maxN)*100));
-    const searched = !isLocal && searchedGestures.has(label);
-    const div=document.createElement('div'); div.className='classItem';
-    div.innerHTML=`<div style="flex:1"><strong>${label}</strong>${searched?' <span style="font-size:11px;background:rgba(56,189,248,.2);padding:2px 8px;border-radius:99px;margin-left:4px">🌐 internet</span>':''}<div class="classBarWrap"><div class="classBarFill" style="width:${pct}%"></div></div></div><span class="pill" style="margin-left:10px">${n} exemplo(s)</span>`;
+
+  const maxN = Math.max(...[...classes].map(l => examples.filter(e => e.label === l).length), 5);
+  [...classes].sort().forEach(label => {
+    const n = examples.filter(e => e.label === label).length;
+    const pct = Math.min(100, Math.round((n / maxN) * 100));
+    const isSearched = !isLocal && searchedGestures.has(label);
+    const div = document.createElement('div');
+    div.className = 'class-item-card';
+    div.innerHTML = `
+      <div style="flex:1">
+        <strong>${label}</strong> ${isSearched ? '<span style="font-size:11px;background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:99px;margin-left:6px;color:#38bdf8">🌐 Web</span>' : ''}
+        <div style="height:5px;background:rgba(255,255,255,0.08);border-radius:99px;margin-top:6px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#38bdf8,#22c55e);border-radius:99px"></div>
+        </div>
+      </div>
+      <span class="badge-pill" style="margin-left:12px">${n} exemplo(s)</span>
+    `;
     list.appendChild(div);
   });
 }
 
-function resetAll(){
-  if(!confirm('Resetar TUDO? As duas IAs vão esquecer tudo que aprenderam.')) return;
-  examplesLocal=[]; classesLocal.clear();
-  examplesOnline=[]; classesOnline.clear();
+// RESETAR TUDO
+function resetAll() {
+  if (!confirm('Deseja resetar todo o conhecimento aprendido? A IA esquecerá todos os gestos.')) return;
+  playSound('reset');
+  examplesLocal = []; classesLocal.clear();
+  examplesOnline = []; classesOnline.clear();
   searchedGestures.clear();
-  document.getElementById('thumbs').innerHTML='';
-  document.getElementById('bigPrediction').textContent='🤖 IA Local: ainda não aprendi nada… ensine um gesto!';
-  document.getElementById('confBar').style.width='0%';
-  document.getElementById('confText').textContent='Confiança: —';
-  document.getElementById('bigPredictionOnline').textContent='🌐 IA Conectada: já pesquisei e sei alguns gestos! Faça um deles 👇';
-  document.getElementById('confBarOnline').style.width='0%';
-  document.getElementById('confTextOnline').textContent='Confiança: —';
-  document.getElementById('dualPred').style.display='none';
-  logEl.innerHTML='';
-  log('🔄 Conhecimento resetado! Pronto para o próximo grupo.');
+  predictionBufferLocal.length = 0;
+  predictionBufferOnline.length = 0;
+
+  document.getElementById('thumbs').innerHTML = '';
+  document.getElementById('bigPrediction').textContent = '🤖 IA Local: aguardando exemplos… ensine um gesto!';
+  document.getElementById('confBar').style.width = '0%';
+  document.getElementById('confText').textContent = 'Confiança: —';
+  document.getElementById('bigPredictionOnline').textContent = '🌐 IA Conectada: faça um gesto pré-treinado!';
+  document.getElementById('confBarOnline').style.width = '0%';
+  document.getElementById('confTextOnline').textContent = 'Confiança: —';
+  document.getElementById('dualPred').style.display = 'none';
+
+  logEl.innerHTML = '';
+  log('🔄 Conhecimento da IA foi resetado. Pronto para o próximo grupo!');
+  seedOnlineGestures();
   updateStats();
 }
 
-// ===== SELETOR DE IA =====
-function setActiveIA(which){
-  activeIA=which;
-  const localCard=document.getElementById('iaLocal');
-  const onlineCard=document.getElementById('iaOnline');
-  localCard.classList.toggle('active', which==='local');
-  onlineCard.classList.toggle('active', which==='online');
-  document.getElementById('predLocalBox').classList.toggle('hiddenPanel', which!=='local');
-  document.getElementById('predOnlineBox').classList.toggle('hiddenPanel', which!=='online');
-  document.getElementById('searchPanel').classList.toggle('hiddenPanel', which!=='online');
-  document.getElementById('teachHint').textContent = which==='local'
-    ? '💡 IA Local: quanto mais exemplos variados, melhor ela aprende com você.'
-    : '💡 IA Conectada: ela já sabe gestos clássicos. Você também pode ensinar gestos novos para ela!';
+// SELETOR DE MODO IA
+function setActiveIA(which) {
+  activeIA = which;
+  document.getElementById('iaLocal').classList.toggle('active', which === 'local');
+  document.getElementById('iaOnline').classList.toggle('active', which === 'online');
+
+  document.getElementById('predLocalBox').classList.toggle('hidden-panel', which !== 'local');
+  document.getElementById('predOnlineBox').classList.toggle('hidden-panel', which !== 'online');
+  document.getElementById('searchPanel').classList.toggle('hidden-panel', which !== 'online');
+
+  document.getElementById('teachHint').innerHTML = which === 'local'
+    ? '💡 <b>IA Local:</b> quanto mais exemplos variados você der, melhor ela aprende na hora.'
+    : '💡 <b>IA Conectada:</b> já vem com gestos da internet. Você também pode ensinar gestos inéditos!';
+
   updateStats();
-  log(which==='local' ? '🏫 IA Local ativada: só aprende com você na hora.' : '🌐 IA Conectada ativada: já pesquisou na internet + aprende com você.');
+  log(which === 'local' ? '🏫 Modo IA Local Ativado.' : '🌐 Modo IA Conectada Ativado.');
 }
 
-document.getElementById('iaLocal').addEventListener('click', ()=>setActiveIA('local'));
-document.getElementById('iaOnline').addEventListener('click', ()=>setActiveIA('online'));
+document.getElementById('iaLocal').addEventListener('click', () => setActiveIA('local'));
+document.getElementById('iaOnline').addEventListener('click', () => setActiveIA('online'));
 
-// ===== PESQUISA NA INTERNET (IA Conectada) =====
-function renderKnownList(){
-  const el=document.getElementById('knownList');
-  el.innerHTML='';
-  INTERNET_GESTURES.forEach(g=>{
-    const chip=document.createElement('span');
-    chip.className='knownChip';
-    chip.textContent=`${g.emoji} ${g.name}`;
-    chip.title=g.desc;
+// PESQUISA NA BIBLIOTECA DA INTERNET
+function renderKnownList() {
+  const el = document.getElementById('knownList');
+  el.innerHTML = '';
+  INTERNET_GESTURES.forEach(g => {
+    const chip = document.createElement('span');
+    chip.className = 'known-chip';
+    chip.textContent = `${g.emoji} ${g.name}`;
+    chip.title = g.desc;
     el.appendChild(chip);
   });
 }
 
-const btnSearch=document.getElementById('btnSearch');
-const searchInput=document.getElementById('searchInput');
-const searchStatus=document.getElementById('searchStatus');
+const btnSearch = document.getElementById('btnSearch');
+const searchInput = document.getElementById('searchInput');
+const searchStatus = document.getElementById('searchStatus');
 
-async function doSearch(){
-  const query=searchInput.value.trim().toLowerCase();
-  if(!query){ alert('Digite o nome do gesto que quer que ela pesquise!'); searchInput.focus(); return; }
-  btnSearch.disabled=true;
-  searchStatus.className='searchStatus show';
-  searchStatus.innerHTML='<div class="spinner"></div> 🌐 Pesquisando na internet por "'+query+'" …';
-  // Simula pesquisa na internet (busca na biblioteca de gestos conhecidos)
-  await new Promise(r=>setTimeout(r, 1200));
-  // tenta encontrar gesto parecido
-  let found=INTERNET_GESTURES.find(g=> g.name.toLowerCase().includes(query) || query.includes(g.name.toLowerCase()) || g.name.toLowerCase().replace(/[()\s]/g,'').includes(query.replace(/\s/g,'')));
-  if(!found){
-    // tenta palavras parciais
-    found=INTERNET_GESTURES.find(g=> query.split(/\s+/).some(w=> w.length>2 && g.name.toLowerCase().includes(w)));
-  }
-  if(found){
+async function doSearch() {
+  const query = searchInput.value.trim().toLowerCase();
+  if (!query) { alert('Digite o nome de um gesto para pesquisar!'); searchInput.focus(); return; }
+
+  playSound('search');
+  btnSearch.disabled = true;
+  searchStatus.className = 'search-status-box show';
+  searchStatus.innerHTML = `🌐 Pesquisando na biblioteca online por "<b>${query}</b>"…`;
+
+  await new Promise(r => setTimeout(r, 800));
+
+  let found = INTERNET_GESTURES.find(g =>
+    g.name.toLowerCase().includes(query) ||
+    query.includes(g.name.toLowerCase())
+  );
+
+  if (found) {
     searchedGestures.add(found.name);
-    // adiciona como exemplo de referência para a IA Conectada
-    const already=examplesOnline.some(e=>e.label===found.name);
-    if(!already){
-      examplesOnline.push({label:found.name, features:null, fingers:found.fingers, thumb:null, fromInternet:true});
-      classesOnline.add(found.name);
-    }
-    searchStatus.innerHTML=`✅ <div><b>${found.emoji} "${found.name}"</b> encontrado na internet!<br><span class="small">${found.desc} — faça esse gesto na frente da câmera e eu reconheço!</span></div>`;
-    log(`🌐 IA Conectada pesquisou e aprendeu "${found.name}" na internet!`);
-  }else{
-    // não encontrou — sugere conhecidos
-    const suggestions=INTERNET_GESTURES.slice(0,6).map(g=>g.emoji+' '+g.name).join(' • ');
-    searchStatus.innerHTML=`😕 Não encontrei "<b>${query}</b>" na minha biblioteca. Tente um destes: ${suggestions}`;
-    log(`😕 IA Conectada não encontrou "${query}" na internet.`);
+    searchStatus.innerHTML = `✅ <div><b>${found.emoji} "${found.name}"</b> encontrado!<br><span style="font-size:12.5px;color:var(--text-muted)">${found.desc}</span></div>`;
+    log(`🌐 IA Conectada carregou o gesto "${found.name}" da biblioteca!`);
+  } else {
+    searchStatus.innerHTML = `😕 Gosto "<b>${query}</b>" não pré-cadastrado. Digite no campo abaixo e ensine com a câmera!`;
+    log(`😕 Gesto "${query}" não encontrado na pré-seleção.`);
   }
-  btnSearch.disabled=false;
+
+  btnSearch.disabled = false;
   updateStats();
 }
 
 btnSearch.addEventListener('click', doSearch);
-searchInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
+// SEED DE EXEMPLOS DA SINTETIZADOS DA INTERNET
+function seedOnlineGestures() {
+  INTERNET_GESTURES.forEach(g => {
+    // Gerar sintetizado para IA Conectada
+    const synthFeats = {
+      fingerExtensions: g.fingerState,
+      jointAngles: g.fingerState.map(s => s ? 0.1 : 1.4),
+      thumbDirVal: g.thumbDir === 'up' ? 1 : (g.thumbDir === 'down' ? -1 : 0),
+      isTouchOK: g.touchIndexThumb ? 1 : 0,
+      landmarks: new Array(63).fill(0)
+    };
+    examplesOnline.push({ label: g.name, features: synthFeats, fromInternet: true });
+    classesOnline.add(g.name);
+  });
+}
+
+// LISTENERS DE EVENTOS
 document.getElementById('btnCamera').addEventListener('click', startCamera);
 document.getElementById('btnPhoto').addEventListener('click', teach);
 document.getElementById('btnTeach').addEventListener('click', teach);
 document.getElementById('btnReset').addEventListener('click', resetAll);
-labelInput.addEventListener('keydown', e=>{ if(e.key==='Enter') teach(); });
-document.addEventListener('keydown', e=>{
-  const k=e.key.toLowerCase();
-  if(e.target===labelInput || e.target===searchInput) return;
-  if(k==='e') teach();
-  if(k==='r') resetAll();
-  if(k==='c' && !cameraOn) startCamera();
-  if(k==='1') setActiveIA('local');
-  if(k==='2') setActiveIA('online');
+labelInput.addEventListener('keydown', e => { if (e.key === 'Enter') teach(); });
+
+document.addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (e.target === labelInput || e.target === searchInput) return;
+  if (k === 'e') teach();
+  if (k === 'r') resetAll();
+  if (k === 'c' && !cameraOn) startCamera();
+  if (k === '1') setActiveIA('local');
+  if (k === '2') setActiveIA('online');
 });
 
-// inicialização: IA Conectada já vem com gestos da internet
-INTERNET_GESTURES.forEach(g=>{
-  examplesOnline.push({label:g.name, features:null, fingers:g.fingers, thumb:null, fromInternet:true});
-  classesOnline.add(g.name);
-});
+// INICIALIZAÇÃO
+seedOnlineGestures();
 renderKnownList();
 updateStats();
-log('Pronto! Ligue a câmera e ensine o primeiro gesto.');
-log('🌐 IA Conectada já pesquisou na internet e conhece '+INTERNET_GESTURES.length+' gestos clássicos!');
+log('Sistema pronto. Ligue a câmera para iniciar a demonstração!');
+log(`🌐 IA Conectada iniciada com ${INTERNET_GESTURES.length} gestos pré-configurados.`);
 </script>
 </body>
 </html>
