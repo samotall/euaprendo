@@ -45,7 +45,6 @@
     overflow-x: hidden;
   }
 
-  /* Canvas background Grid Effect */
   body::before {
     content: "";
     position: fixed;
@@ -57,7 +56,6 @@
     z-index: 0;
   }
 
-  /* HEADER */
   header {
     position: relative;
     z-index: 2;
@@ -155,7 +153,6 @@
     backdrop-filter: blur(8px);
   }
 
-  /* LAYOUT */
   main {
     position: relative;
     z-index: 2;
@@ -172,7 +169,6 @@
     main { grid-template-columns: 1fr; }
   }
 
-  /* CARDS */
   .card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -211,7 +207,6 @@
     box-shadow: 0 0 10px var(--accent-glow);
   }
 
-  /* IA SELECTOR CARDS */
   .ia-selector-container {
     max-width: 1240px;
     margin: 16px auto 0;
@@ -317,7 +312,6 @@
   }
   @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
 
-  /* VIDEO CONTAINER */
   #videoWrap {
     position: relative;
     background: #020617;
@@ -392,7 +386,6 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.4);
   }
 
-  /* BUTTONS & INPUTS */
   .btn-row {
     display: flex;
     gap: 12px;
@@ -489,7 +482,6 @@
     text-transform: uppercase;
   }
 
-  /* RADAR / DEDOS VISUALIZER */
   .hand-radar-box {
     display: flex;
     justify-content: space-around;
@@ -532,7 +524,6 @@
     box-shadow: 0 0 8px var(--primary);
   }
 
-  /* PREDICTION DISPLAY BOX */
   .prediction-box {
     margin-top: 16px;
     background: rgba(15, 23, 42, 0.6);
@@ -584,7 +575,6 @@
     font-weight: 600;
   }
 
-  /* DUAL PREDICTION MINI BOXES */
   .dual-pred-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -633,7 +623,6 @@
     box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
   }
 
-  /* STEPS LIST */
   .steps-list {
     counter-reset: step;
     display: flex;
@@ -663,7 +652,6 @@
   .step-badge::before { content: counter(step); }
   .step-text { font-size: 14px; line-height: 1.5; color: #e2e8f0; }
 
-  /* STATS & THUMBNAILS */
   .stat-row {
     display: flex;
     justify-content: space-between;
@@ -726,7 +714,6 @@
     object-fit: cover;
   }
 
-  /* LEARNING LOG */
   #learningLog {
     max-height: 160px;
     overflow-y: auto;
@@ -749,7 +736,6 @@
   }
   .log-line::before { content: "▸"; color: var(--primary); }
 
-  /* DANGER ZONE */
   .danger-zone {
     border: 1.5px solid rgba(248, 113, 113, 0.25);
     background: rgba(239, 68, 68, 0.04);
@@ -758,7 +744,6 @@
     margin-top: 20px;
   }
 
-  /* SEARCH PANEL */
   .search-status-box {
     margin-top: 12px;
     padding: 12px 14px;
@@ -822,17 +807,16 @@
     </div>
   </div>
   <h1>IA que <span class="grad-cyan">Aprende Gestos</span><br><span class="grad-green">em Tempo Real!</span></h1>
-  <p class="sub">Ensine um gesto com a mão e veja o algoritmo de IA de alta precisão aprender e adivinhar ao vivo na frente dos visitantes.</p>
+  <p class="sub">Ensine gestos com uma ou duas mãos e veja o algoritmo de IA reconhecer ao vivo na frente dos visitantes.</p>
 
   <div class="badges-row">
-    <span class="tag-pill">📷 Visão Computacional 3D</span>
-    <span class="tag-pill">⚡ KNN Ponderado + Vetor de Ângulos</span>
+    <span class="tag-pill">📷 Visão Computacional 3D (Suporte Dual-Hand)</span>
+    <span class="tag-pill">⚡ KNN Ponderado + Vetor Espacial</span>
     <span class="tag-pill">🧠 Filtro Temporal Suave</span>
     <span class="tag-pill">☁️ Supabase Cloud Storage</span>
   </div>
 </header>
 
-<!-- SELETOR DE MODO DA IA -->
 <div class="ia-selector-container">
   <div class="card">
     <div class="card-header">
@@ -846,7 +830,7 @@
           <div class="ia-icon local">🏫</div>
           <div><h3>IA Local (Aprendizado do Zero)</h3></div>
         </div>
-        <p>Aprende <b>somente com o que você mostra</b> na hora. Começa zerada e demonstra visualmente o processo de coleta de dados e treinamento KNN.</p>
+        <p>Aprende <b>somente com o que você mostra</b> na hora com 1 ou 2 mãos. Começa zerada e demonstra o processo dinâmico.</p>
         <span class="ia-tag"><span class="pulse-dot"></span>NUVEM • Treinamento Dinâmico</span>
       </div>
 
@@ -856,15 +840,14 @@
           <div class="ia-icon online">📚</div>
           <div><h3>IA Pré-Treinada (Biblioteca Expandida)</h3></div>
         </div>
-        <p>Já possui um banco de dados robusto integrado com gestos clássicos (joinha, paz, ok, Libras…) e consulta inteligente via nuvem.</p>
-        <span class="ia-tag"><span class="pulse-dot" style="background:#38bdf8"></span>BIBLIOTECA 3D • Consulta Inteligente</span>
+        <p>Possui banco robusto com gestos clássicos de 1 e 2 mãos (coração, pomba, joinha, paz, aplauso…) e busca na nuvem.</p>
+        <span class="ia-tag"><span class="pulse-dot" style="background:#38bdf8"></span>BIBLIOTECA 3D • 1 & 2 Mãos</span>
       </div>
     </div>
   </div>
 </div>
 
 <main>
-  <!-- ESQUERDA: CÂMERA & VISUALIZAÇÃO DA IA -->
   <section class="card">
     <div class="card-header">
       <h2 class="card-title"><span class="dot-indicator"></span> Câmera e Análise Visão 3D</h2>
@@ -883,7 +866,6 @@
       <button class="btn-ghost" id="btnPhoto" disabled>📸 Capturar Exemplo (E)</button>
     </div>
 
-    <!-- RADAR VISUAL DOS DEDOS -->
     <div class="hand-radar-box">
       <div class="finger-indicator" id="indThumb"><div class="finger-bar-outer"><div class="finger-bar-inner"></div></div>Polegar</div>
       <div class="finger-indicator" id="indIndex"><div class="finger-bar-outer"><div class="finger-bar-inner"></div></div>Indicador</div>
@@ -892,7 +874,6 @@
       <div class="finger-indicator" id="indPinky"><div class="finger-bar-outer"><div class="finger-bar-inner"></div></div>Mínimo</div>
     </div>
 
-    <!-- PAINEL PREDIÇÃO IA LOCAL -->
     <div class="prediction-box" id="predLocalBox">
       <div class="big-prediction-title" id="bigPrediction">🤖 IA Local: aguardando exemplos… ensine um gesto!</div>
       <div class="bar-wrap"><div class="bar-fill" id="confBar"></div></div>
@@ -902,7 +883,6 @@
       </div>
     </div>
 
-    <!-- PAINEL PREDIÇÃO IA PRÉ-TREINADA -->
     <div class="prediction-box hidden-panel" id="predOnlineBox" style="border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.05);">
       <div class="big-prediction-title" id="bigPredictionOnline">📚 IA Pré-Treinada: faça um gesto da biblioteca!</div>
       <div class="bar-wrap"><div class="bar-fill" id="confBarOnline" style="background: linear-gradient(90deg, #38bdf8, #a78bfa);"></div></div>
@@ -913,7 +893,6 @@
       <div class="known-chips-list" id="knownList"></div>
     </div>
 
-    <!-- PAINEL DE COMPARAÇÃO DUPLA -->
     <div class="dual-pred-grid" id="dualPred" style="display:none">
       <div class="pred-mini-card" id="miniLocal">
         <div class="who">🏫 IA Local</div>
@@ -934,46 +913,42 @@
     </div>
   </section>
 
-  <!-- DIREITA: ENSINAR & ESTATÍSTICAS -->
   <section style="display:flex; flex-direction:column; gap:24px;">
-    <!-- CARD COMO ENSINAR -->
     <div class="card">
       <div class="card-header">
         <h2 class="card-title"><span class="dot-indicator" style="background:#38bdf8"></span> 🎓 Como Ensinar a IA</h2>
       </div>
 
       <div class="steps-list">
-        <div class="step-item"><div class="step-badge"></div><div class="step-text">Digite o <b>nome do gesto</b> (ex.: <i>joinha</i>, <i>paz</i>, <i>ok</i>, <i>coração</i>).</div></div>
-        <div class="step-item"><div class="step-badge"></div><div class="step-text">Faça o gesto na câmera e clique em <b>Capturar exemplo</b> (ou aperte a tecla <span class="kbd">E</span>).</div></div>
-        <div class="step-item"><div class="step-badge"></div><div class="step-text">Repita <b>5 a 8 vezes</b> variando ligeiramente o ângulo da mão para máxima precisão.</div></div>
-        <div class="step-item"><div class="step-badge"></div><div class="step-text">Ensine outros gestos e veja a IA adivinhar em tempo real com alta precisão!</div></div>
+        <div class="step-item"><div class="step-badge"></div><div class="step-text">Digite o <b>nome do gesto</b> (ex.: <i>coração</i>, <i>pomba</i>, <i>aplauso</i>).</div></div>
+        <div class="step-item"><div class="step-badge"></div><div class="step-text">Posicione <b>1 ou 2 mãos juntas</b> na câmera e clique em <b>Capturar exemplo</b> (<span class="kbd">E</span>).</div></div>
+        <div class="step-item"><div class="step-badge"></div><div class="step-text">Repita <b>5 a 8 vezes</b> variando levemente a distância para máxima precisão.</div></div>
+        <div class="step-item"><div class="step-badge"></div><div class="step-text">Alterne entre IA Local e Pré-Treinada para testar os gestos interativos!</div></div>
       </div>
 
-      <!-- PESQUISAR NO BANCO DE DADOS INTELIGENTE (MODO PRÉ-TREINADO) -->
       <div id="searchPanel" class="hidden-panel" style="margin-bottom: 20px;">
         <label class="input-label" for="searchInput">🔍 Pesquisar Gesto no Banco Pré-Treinado</label>
         <div style="display:flex; gap:8px;">
-          <input type="text" id="searchInput" placeholder="Ex.: joinha, paz, ok, coração, roque, L, shaka…">
+          <input type="text" id="searchInput" placeholder="Ex.: coração, pomba, joinha, paz, aplauso…">
           <button class="btn-blue" id="btnSearch" style="flex:0 0 auto">📚 Buscar</button>
         </div>
         <div class="search-status-box" id="searchStatus"></div>
       </div>
 
       <label class="input-label" for="labelInput">🏷️ Nome do Gesto</label>
-      <input type="text" id="labelInput" placeholder="Ex.: joinha, paz, ok, coração, tchau" maxlength="40">
+      <input type="text" id="labelInput" placeholder="Ex.: coração, pomba, joinha, paz, aplauso" maxlength="40">
 
       <div style="margin-top: 14px;">
         <button class="btn-blue" id="btnTeach" style="width:100%">➕ Ensinar este gesto (Atalho: E)</button>
       </div>
 
       <p style="color:var(--text-muted);font-size:13px;margin-top:10px" id="teachHint">
-        💡 <b>Dica de IA:</b> Quanto mais variação nos exemplos (perto/longe, leve inclinação), mais inteligente o modelo fica!
+        💡 <b>Dica de IA:</b> Gestos de 2 mãos como o coração unem os indicadores e polegares das duas mãos na frente da câmera!
       </p>
 
       <div class="example-thumbs-grid" id="thumbs"></div>
     </div>
 
-    <!-- CARD ESTATÍSTICAS DO MODELO -->
     <div class="card">
       <div class="card-header">
         <h2 class="card-title"><span class="dot-indicator" style="background:#a78bfa"></span> 🧠 Painel de Aprendizado da IA</h2>
@@ -992,7 +967,7 @@
 </main>
 
 <footer>
-  Desenvolvido para Feira de Ciências 2026 • Visão Computacional com MediaPipe Hands + KNN Geométrico 3D.
+  Desenvolvido para Feira de Ciências 2026 • Visão Computacional com MediaPipe Hands (Dual-Hand 3D).
   <div style="width:60px;height:1px;background:rgba(255,255,255,0.15);margin:16px auto"></div>
   Atalhos de Teclado: <span class="kbd">E</span> Ensinar gesto &nbsp;|&nbsp; <span class="kbd">R</span> Reset &nbsp;|&nbsp; <span class="kbd">C</span> Câmera &nbsp;|&nbsp; <span class="kbd">1</span> IA Local &nbsp;|&nbsp; <span class="kbd">2</span> IA Pré-Treinada
 </footer>
@@ -1001,9 +976,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-// ==========================================
-// SINTETIZADOR DE ÁUDIO SIMPLES (WEBAUDIO)
-// ==========================================
 let soundEnabled = true;
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -1048,10 +1020,7 @@ document.getElementById('btnSoundToggle').addEventListener('click', () => {
   document.getElementById('btnSoundToggle').textContent = soundEnabled ? '🔊 Som: LIGADO' : '🔇 Som: DESLIGADO';
 });
 
-// ==========================================
-// PERSISTÊNCIA NA NUVEM (SUPABASE)
-// ==========================================
-// Substitua o SUPABASE_URL com a URL do seu projeto Supabase
+// SUPABASE CONFIGURAÇÃO
 const SUPABASE_URL = 'https://SUA_URL_DO_SUPABASE.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_3uHRwplEvjjAjMHk1dYsPw_oBhcq6F8';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1153,126 +1122,132 @@ async function clearAllExamplesCloud() {
 }
 
 // ESTADO E VARIÁVEIS GLOBAIS
-// ==========================================
-let activeIA = 'local'; // 'local' | 'online'
+let activeIA = 'local';
 let cameraOn = false;
 let lastHand = null;
 let teaching = false;
 
-// IA LOCAL
 let examplesLocal = [];
 let classesLocal = new Set();
 
-// IA PRÉ-TREINADA
 let examplesOnline = [];
 let classesOnline = new Set();
 let searchedGestures = new Set();
 
-// SUAVIZAÇÃO TEMPORAL (SMOOTHING BUFFER)
 const predictionBufferLocal = [];
 const predictionBufferOnline = [];
 const BUFFER_SIZE = 4;
 
-// ==========================================
-// BIBLIOTECA DE GESTOS PRÉ-TREINADA (3D ACCURATE)
-// ==========================================
+// BIBLIOTECA EXPANDIDA COM GESTOS DE DUAS MÃOS E UMA MÃO
 const INTERNET_GESTURES = [
-  { name: 'joinha', emoji: '👍', desc: 'Polegar para CIMA, outros 4 dedos fechados', fingerState: [1,0,0,0,0], thumbDir: 'up' },
-  { name: 'joinha pra baixo', emoji: '👎', desc: 'Polegar para BAIXO, outros 4 dedos fechados', fingerState: [1,0,0,0,0], thumbDir: 'down' },
-  { name: 'paz', emoji: '✌️', desc: 'Indicador e Médio levantados em V', fingerState: [0,1,1,0,0], thumbDir: 'neutral' },
-  { name: 'ok', emoji: '👌', desc: 'Indicador encostando no Polegar, os outros 3 esticados', fingerState: [1,1,1,1,1], touchIndexThumb: true, thumbDir: 'neutral' },
-  { name: 'coração', emoji: '🤟', desc: 'Polegar e Indicador cruzados formando um mini coração', fingerState: [1,1,0,0,0], touchIndexThumb: true, thumbDir: 'neutral' },
-  { name: 'tchau / mão aberta', emoji: '👋', desc: 'Todos os 5 dedos esticados e abertos', fingerState: [1,1,1,1,1], thumbDir: 'neutral' },
-  { name: 'roque / metal', emoji: '🤘', desc: 'Indicador e Mínimo esticados, Médio e Anelar fechados', fingerState: [0,1,0,0,1], thumbDir: 'neutral' },
-  { name: 'eu te amo (Libras)', emoji: '🤟', desc: 'Polegar, Indicador e Mínimo esticados', fingerState: [1,1,0,0,1], thumbDir: 'neutral' },
-  { name: 'apontando', emoji: '👉', desc: 'Indicador esticado, outros dedos fechados', fingerState: [0,1,0,0,0], thumbDir: 'neutral' },
-  { name: 'punho fechado', emoji: '✊', desc: 'Todos os 5 dedos fechados', fingerState: [0,0,0,0,0], thumbDir: 'neutral' },
-  { name: 'número 3', emoji: '🤟', desc: 'Polegar, Indicador e Médio levantados', fingerState: [1,1,1,0,0], thumbDir: 'neutral' },
-  { name: 'arma / pistol', emoji: '👉', desc: 'Polegar e Indicador formando um L de 90°', fingerState: [1,1,0,0,0], thumbDir: 'up' },
-  { name: 'shaka / hang loose', emoji: '🤙', desc: 'Polegar e Mínimo esticados nas pontas', fingerState: [1,0,0,0,1], thumbDir: 'neutral' }
+  // GESTOS COM DUAS MÃOS
+  { name: 'coração', emoji: '🫶', desc: 'Duas mãos unidas formando o símbolo de coração com polegares e indicadores', twoHands: true, fingerStateLeft: [1,1,0,0,0], fingerStateRight: [1,1,0,0,0] },
+  { name: 'pomba', emoji: '🕊️', desc: 'Duas mãos cruzadas pelos polegares simulando asas abertas', twoHands: true, fingerStateLeft: [1,1,1,1,1], fingerStateRight: [1,1,1,1,1] },
+  { name: 'aplauso', emoji: '👏', desc: 'Duas mãos abertas uma de frente para a outra', twoHands: true, fingerStateLeft: [1,1,1,1,1], fingerStateRight: [1,1,1,1,1] },
+  { name: 'rezar / namaste', emoji: '🙏', desc: 'Duas palmas unidas verticalmente na altura do peito', twoHands: true, fingerStateLeft: [1,1,1,1,1], fingerStateRight: [1,1,1,1,1] },
+  { name: 'X com os braços', emoji: '❌', desc: 'Antebraços cruzados em formato de X na frente da câmera', twoHands: true, fingerStateLeft: [0,1,0,0,0], fingerStateRight: [0,1,0,0,0] },
+
+  // GESTOS CLÁSSICOS DE UMA MÃO
+  { name: 'joinha', emoji: '👍', desc: 'Polegar para CIMA, outros 4 dedos fechados', twoHands: false, fingerStateLeft: [1,0,0,0,0], thumbDir: 'up' },
+  { name: 'joinha pra baixo', emoji: '👎', desc: 'Polegar para BAIXO, outros 4 dedos fechados', twoHands: false, fingerStateLeft: [1,0,0,0,0], thumbDir: 'down' },
+  { name: 'paz', emoji: '✌️', desc: 'Indicador e Médio levantados em V', twoHands: false, fingerStateLeft: [0,1,1,0,0], thumbDir: 'neutral' },
+  { name: 'ok', emoji: '👌', desc: 'Indicador encostando no Polegar, os outros 3 esticados', twoHands: false, fingerStateLeft: [1,1,1,1,1], touchIndexThumb: true, thumbDir: 'neutral' },
+  { name: 'tchau / mão aberta', emoji: '👋', desc: 'Todos os 5 dedos esticados e abertos', twoHands: false, fingerStateLeft: [1,1,1,1,1], thumbDir: 'neutral' },
+  { name: 'roque / metal', emoji: '🤘', desc: 'Indicador e Mínimo esticados, Médio e Anelar fechados', twoHands: false, fingerStateLeft: [0,1,0,0,1], thumbDir: 'neutral' },
+  { name: 'eu te amo (Libras)', emoji: '🤟', desc: 'Polegar, Indicador e Mínimo esticados', twoHands: false, fingerStateLeft: [1,1,0,0,1], thumbDir: 'neutral' },
+  { name: 'punho fechado', emoji: '✊', desc: 'Todos os 5 dedos fechados', twoHands: false, fingerStateLeft: [0,0,0,0,0], thumbDir: 'neutral' },
+  { name: 'shaka / hang loose', emoji: '🤙', desc: 'Polegar e Mínimo esticados nas pontas', twoHands: false, fingerStateLeft: [1,0,0,0,1], thumbDir: 'neutral' }
 ];
 
-// ==========================================
-// EXTRATOR DE FEATURES GEOMÉTRICAS 3D (OTIMIZADO)
-// ==========================================
-function extractAdvancedFeatures(hand) {
-  const wrist = hand[0];
-  const mcps = [1, 5, 9, 13, 17];
-  const pips = [2, 6, 10, 14, 18];
-  const tips = [4, 8, 12, 16, 20];
+// EXTRATOR AVANÇADO DUAL-HAND 3D
+function extractAdvancedFeatures(resultsHands) {
+  if (!resultsHands || resultsHands.length === 0) return null;
 
-  const scale = Math.hypot(hand[9].x - wrist.x, hand[9].y - wrist.y, (hand[9].z||0) - (wrist.z||0)) || 1.0;
+  const sortedHands = [...resultsHands].sort((a, b) => a[0].x - b[0].x);
+  
+  let combinedLandmarks = [];
+  let combinedExtensions = [];
+  let combinedJointAngles = [];
+  let combinedThumbDir = 0;
+  let combinedTouch = 0;
 
-  const fingerExtensions = [];
-  const jointAngles = [];
-  const normalizedLandmarks = [];
+  sortedHands.forEach(hand => {
+    const wrist = hand[0];
+    const mcps = [1, 5, 9, 13, 17];
+    const pips = [2, 6, 10, 14, 18];
+    const tips = [4, 8, 12, 16, 20];
 
-  for (let i = 0; i < 5; i++) {
-    const tipDist = Math.hypot(hand[tips[i]].x - wrist.x, hand[tips[i]].y - wrist.y, (hand[tips[i]].z||0) - (wrist.z||0));
-    const mcpDist = Math.hypot(hand[mcps[i]].x - wrist.x, hand[mcps[i]].y - wrist.y, (hand[mcps[i]].z||0) - (wrist.z||0));
-    const ratio = tipDist / mcpDist;
+    const scale = Math.hypot(hand[9].x - wrist.x, hand[9].y - wrist.y, (hand[9].z||0) - (wrist.z||0)) || 1.0;
 
-    let extScore = 0;
-    if (i === 0) {
-      extScore = Math.max(0, Math.min(1, (ratio - 1.1) / 0.6));
-    } else {
-      extScore = Math.max(0, Math.min(1, (ratio - 1.0) / 0.85));
+    for (let i = 0; i < 5; i++) {
+      const tipDist = Math.hypot(hand[tips[i]].x - wrist.x, hand[tips[i]].y - wrist.y, (hand[tips[i]].z||0) - (wrist.z||0));
+      const mcpDist = Math.hypot(hand[mcps[i]].x - wrist.x, hand[mcps[i]].y - wrist.y, (hand[mcps[i]].z||0) - (wrist.z||0));
+      const ratio = tipDist / mcpDist;
+
+      let extScore = i === 0 ? Math.max(0, Math.min(1, (ratio - 1.1) / 0.6)) : Math.max(0, Math.min(1, (ratio - 1.0) / 0.85));
+      combinedExtensions.push(extScore);
+
+      const v1 = { x: hand[pips[i]].x - hand[mcps[i]].x, y: hand[pips[i]].y - hand[mcps[i]].y };
+      const v2 = { x: hand[tips[i]].x - hand[pips[i]].x, y: hand[tips[i]].y - hand[pips[i]].y };
+      const dot = v1.x * v2.x + v1.y * v2.y;
+      const mag1 = Math.hypot(v1.x, v1.y);
+      const mag2 = Math.hypot(v2.x, v2.y);
+      const cosAngle = (mag1 * mag2) > 0 ? dot / (mag1 * mag2) : 1;
+      combinedJointAngles.push(Math.acos(Math.max(-1, Math.min(1, cosAngle))));
     }
-    fingerExtensions.push(extScore);
 
-    const v1 = { x: hand[pips[i]].x - hand[mcps[i]].x, y: hand[pips[i]].y - hand[mcps[i]].y };
-    const v2 = { x: hand[tips[i]].x - hand[pips[i]].x, y: hand[tips[i]].y - hand[pips[i]].y };
-    const dot = v1.x * v2.x + v1.y * v2.y;
-    const mag1 = Math.hypot(v1.x, v1.y);
-    const mag2 = Math.hypot(v2.x, v2.y);
-    const cosAngle = (mag1 * mag2) > 0 ? dot / (mag1 * mag2) : 1;
-    jointAngles.push(Math.acos(Math.max(-1, Math.min(1, cosAngle))));
-  }
+    const thumbY = hand[4].y - wrist.y;
+    if (thumbY < -0.2 * scale) combinedThumbDir += 1;
+    else if (thumbY > 0.15 * scale) combinedThumbDir -= 1;
 
-  const thumbY = hand[4].y - wrist.y;
-  let thumbDirVal = 0;
-  if (thumbY < -0.2 * scale) thumbDirVal = 1;
-  else if (thumbY > 0.15 * scale) thumbDirVal = -1;
+    const distIndexThumb = Math.hypot(hand[4].x - hand[8].x, hand[4].y - hand[8].y) / scale;
+    if (distIndexThumb < 0.35) combinedTouch += 1;
 
-  const distIndexThumb = Math.hypot(hand[4].x - hand[8].x, hand[4].y - hand[8].y) / scale;
-  const isTouchOK = distIndexThumb < 0.35 ? 1 : 0;
+    for (const lm of hand) {
+      combinedLandmarks.push((lm.x - wrist.x) / scale);
+      combinedLandmarks.push((lm.y - wrist.y) / scale);
+      combinedLandmarks.push(((lm.z || 0) - (wrist.z || 0)) / scale);
+    }
+  });
 
-  for (const lm of hand) {
-    normalizedLandmarks.push((lm.x - wrist.x) / scale);
-    normalizedLandmarks.push((lm.y - wrist.y) / scale);
-    normalizedLandmarks.push(((lm.z || 0) - (wrist.z || 0)) / scale);
+  if (sortedHands.length === 1) {
+    combinedLandmarks = combinedLandmarks.concat(new Array(63).fill(0));
+    for (let i = 0; i < 5; i++) { combinedExtensions.push(0); combinedJointAngles.push(0); }
   }
 
   return {
-    fingerExtensions,
-    jointAngles,
-    thumbDirVal,
-    isTouchOK,
-    landmarks: normalizedLandmarks
+    fingerExtensions: combinedExtensions,
+    jointAngles: combinedJointAngles,
+    thumbDirVal: combinedThumbDir,
+    isTouchOK: combinedTouch,
+    landmarks: combinedLandmarks,
+    handsCount: sortedHands.length
   };
 }
-// Função original de distância sem pesos exagerados
+
 function computeHandDistance(featA, featB) {
   let dist = 0;
+  const len = Math.min(featA.fingerExtensions.length, featB.fingerExtensions.length);
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < len; i++) {
     const diff = featA.fingerExtensions[i] - featB.fingerExtensions[i];
     dist += 3.0 * (diff * diff);
   }
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < len; i++) {
     const diff = featA.jointAngles[i] - featB.jointAngles[i];
     dist += 2.0 * (diff * diff);
   }
 
-  const thumbDiff = featA.thumbDirVal - featB.thumbDirVal;
-  dist += 2.5 * (thumbDiff * thumbDiff);
+  const thumbDiff = (featA.thumbDirVal || 0) - (featB.thumbDirVal || 0);
+    dist += 2.5 * (thumbDiff * thumbDiff);
 
-  const touchDiff = featA.isTouchOK - featB.isTouchOK;
+  const touchDiff = (featA.isTouchOK || 0) - (featB.isTouchOK || 0);
   dist += 2.0 * (touchDiff * touchDiff);
 
   let lmDist = 0;
-  for (let i = 0; i < featA.landmarks.length; i++) {
+  const lmLen = Math.min(featA.landmarks.length, featB.landmarks.length);
+  for (let i = 0; i < lmLen; i++) {
     const d = featA.landmarks[i] - featB.landmarks[i];
     lmDist += d * d;
   }
@@ -1281,7 +1256,6 @@ function computeHandDistance(featA, featB) {
   return Math.sqrt(dist);
 }
 
-// Função original do KNN sem o limiar rígido de rejeição
 function knnPredictAdvanced(feat, exampleSet) {
   if (!exampleSet.length) return null;
 
@@ -1345,9 +1319,6 @@ function smoothPrediction(pred, buffer) {
   return { label: bestLabel, confidence: avgConf, distance: pred.distance };
 }
 
-// ==========================================
-// RENDERIZAÇÃO ESTILIZADA DO CANVAS (NEON 3D)
-// ==========================================
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -1366,7 +1337,7 @@ const hands = new Hands({
   locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
 });
 hands.setOptions({
-  maxNumHands: 1,
+  maxNumHands: 2,
   modelComplexity: 1,
   minDetectionConfidence: 0.6,
   minTrackingConfidence: 0.6
@@ -1381,51 +1352,31 @@ function onResults(res) {
   const h = canvas.height = video.videoHeight || 480;
   ctx.clearRect(0, 0, w, h);
 
-  if (res.multiHandLandmarks && res.multiHandLandmarks.length) {
-    lastHand = res.multiHandLandmarks[0];
+  if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
+    lastHand = res.multiHandLandmarks;
 
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = '#38bdf8';
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.85)';
-    ctx.lineWidth = 3;
+    res.multiHandLandmarks.forEach(hand => {
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = '#38bdf8';
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.85)';
+      ctx.lineWidth = 3;
 
-    for (const [a, b] of PALM_CONNECTIONS) {
-      ctx.beginPath();
-      ctx.moveTo(lastHand[a].x * w, lastHand[a].y * h);
-      ctx.lineTo(lastHand[b].x * w, lastHand[b].y * h);
-      ctx.stroke();
-    }
-
-    for (let i = 0; i < lastHand.length; i++) {
-      const lm = lastHand[i];
-      const fingerIdx = i === 0 ? 0 : Math.floor((i - 1) / 4);
-      const color = FINGER_COLORS[fingerIdx] || '#38bdf8';
-
-      ctx.beginPath();
-      ctx.arc(lm.x * w, lm.y * h, (i % 4 === 0) ? 6 : 4, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.shadowColor = color;
-      ctx.shadowBlur = 10;
-      ctx.fill();
-
-      if ([4, 8, 12, 16, 20].includes(i)) {
+      for (const [a, b] of PALM_CONNECTIONS) {
         ctx.beginPath();
-        ctx.arc(lm.x * w, lm.y * h, 9, 0, Math.PI * 2);
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 1.5;
+        ctx.moveTo(hand[a].x * w, hand[a].y * h);
+        ctx.lineTo(hand[b].x * w, hand[b].y * h);
         ctx.stroke();
       }
-    }
-    ctx.shadowBlur = 0;
+    });
 
-    const feats = extractAdvancedFeatures(lastHand);
-    updateFingerRadar(feats.fingerExtensions);
+    const feats = extractAdvancedFeatures(res.multiHandLandmarks);
+    if (feats) updateFingerRadar(feats.fingerExtensions.slice(0, 5));
 
     if (!teaching) predict();
-    overlay.textContent = '✋ Mão Detectada em Tempo Real! ' + (teaching ? 'APRENDENDO…' : 'Analisando gestos…');
+    overlay.textContent = `✋ ${res.multiHandLandmarks.length} Mão(s) Detectada(s)! Analisando…`;
   } else {
     lastHand = null;
-    overlay.textContent = '🖐️ Posicione sua mão na câmera para iniciar';
+    overlay.textContent = '🖐️ Posicione sua(s) mão(s) na câmera para iniciar';
     resetFingerRadar();
   }
 }
@@ -1482,6 +1433,7 @@ function predict() {
   if (!lastHand) return;
 
   const feats = extractAdvancedFeatures(lastHand);
+  if (!feats) return;
 
   const rawPredLocal = knnPredictAdvanced(feats, examplesLocal);
   const resLocal = smoothPrediction(rawPredLocal, predictionBufferLocal);
@@ -1567,7 +1519,7 @@ function teach() {
   const label = labelInput.value.trim().toLowerCase();
   if (!label) { alert('Por favor, digite o nome do gesto primeiro!'); labelInput.focus(); return; }
   if (!cameraOn) { alert('Ligue a câmera primeiro!'); return; }
-  if (!lastHand) { alert('Posicione sua mão na câmera antes de capturar!'); return; }
+  if (!lastHand) { alert('Posicione sua(s) mão(s) na câmera antes de capturar!'); return; }
 
   teaching = true;
   playSound('capture');
@@ -1604,7 +1556,7 @@ function teach() {
 
   const who = activeIA === 'local' ? 'IA Local' : 'IA Pré-Treinada';
   overlay.textContent = `✅ ${who} gravou o exemplo para "${label}"!`;
-  setTimeout(() => { if (lastHand) overlay.textContent = '✋ Mão detectada! Testando…'; }, 1600);
+  setTimeout(() => { if (lastHand) overlay.textContent = '✋ Mão(s) detectada(s)! Testando…'; }, 1600);
 }
 
 function updateStats() {
@@ -1746,12 +1698,22 @@ searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch()
 
 function seedOnlineGestures() {
   INTERNET_GESTURES.forEach(g => {
+    let fExt, fAng;
+    if (g.twoHands) {
+      fExt = [...g.fingerStateLeft, ...g.fingerStateRight];
+      fAng = [...g.fingerStateLeft.map(s => s ? 0.1 : 1.4), ...g.fingerStateRight.map(s => s ? 0.1 : 1.4)];
+    } else {
+      fExt = [...g.fingerStateLeft, 0, 0, 0, 0, 0];
+      fAng = [...g.fingerStateLeft.map(s => s ? 0.1 : 1.4), 0, 0, 0, 0, 0];
+    }
+
     const synthFeats = {
-      fingerExtensions: g.fingerState,
-      jointAngles: g.fingerState.map(s => s ? 0.1 : 1.4),
+      fingerExtensions: fExt,
+      jointAngles: fAng,
       thumbDirVal: g.thumbDir === 'up' ? 1 : (g.thumbDir === 'down' ? -1 : 0),
       isTouchOK: g.touchIndexThumb ? 1 : 0,
-      landmarks: new Array(63).fill(0)
+      landmarks: new Array(126).fill(0),
+      handsCount: g.twoHands ? 2 : 1
     };
     examplesOnline.push({ label: g.name, features: synthFeats, fromInternet: true });
     classesOnline.add(g.name);
@@ -1780,7 +1742,7 @@ loadStoredGestures();
 renderKnownList();
 updateStats();
 log('Sistema pronto. Ligue a câmera para iniciar a demonstração!');
-log(`📚 IA Pré-Treinada iniciada com ${INTERNET_GESTURES.length} gestos no banco de dados 3D.`);
+log(`📚 IA Pré-Treinada iniciada com ${INTERNET_GESTURES.length} gestos (incluindo suporte a 2 mãos).`);
 </script>
 </body>
 </html>
