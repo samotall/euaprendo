@@ -828,7 +828,7 @@
     <span class="tag-pill">📷 Visão Computacional 3D</span>
     <span class="tag-pill">⚡ KNN Ponderado + Vetor de Ângulos</span>
     <span class="tag-pill">🧠 Filtro Temporal Suave</span>
-    <span class="tag-pill">🔒 100% Local no Navegador</span>
+    <span class="tag-pill">☁️ Supabase Cloud Storage</span>
   </div>
 </header>
 
@@ -847,7 +847,7 @@
           <div><h3>IA Local (Aprendizado do Zero)</h3></div>
         </div>
         <p>Aprende <b>somente com o que você mostra</b> na hora. Começa zerada e demonstra visualmente o processo de coleta de dados e treinamento KNN.</p>
-        <span class="ia-tag"><span class="pulse-dot"></span>OFFLINE • Treinamento Dinâmico</span>
+        <span class="ia-tag"><span class="pulse-dot"></span>NUVEM • Treinamento Dinâmico</span>
       </div>
 
       <div class="ia-card online" id="iaOnline">
@@ -929,7 +929,7 @@
 
     <div class="danger-zone">
       <b style="display:flex;align-items:center;gap:8px">⚙️ Reiniciar Conhecimento para Novo Grupo</b>
-      <p style="color:var(--text-muted);font-size:13.5px;margin:8px 0 14px">Apaga todos os exemplos coletados nesta sessão para que um novo grupo de visitantes possa ensinar a IA do zero.</p>
+      <p style="color:var(--text-muted);font-size:13.5px;margin:8px 0 14px">Apaga todos os exemplos coletados nesta sessão no Supabase para que um novo grupo de visitantes possa ensinar a IA do zero.</p>
       <button class="btn-danger" id="btnReset">🧹 Resetar Conhecimento da IA (R)</button>
     </div>
   </section>
@@ -999,6 +999,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 // ==========================================
 // SINTETIZADOR DE ÁUDIO SIMPLES (WEBAUDIO)
@@ -1048,6 +1049,110 @@ document.getElementById('btnSoundToggle').addEventListener('click', () => {
 });
 
 // ==========================================
+// PERSISTÊNCIA NA NUVEM (SUPABASE)
+// ==========================================
+// Substitua o SUPABASE_URL com a URL do seu projeto Supabase
+const SUPABASE_URL = 'https://wfvryvzknbzvqfrqlysn.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_3uHRwplEvjjAjMHk1dYsPw_oBhcq6F8';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function saveExampleCloud(example) {
+  try {
+    let publicUrl = example.thumb;
+
+    // Se houver imagem base64, faz o upload para o Bucket de Storage do Supabase
+    if (example.thumb && example.thumb.startsWith('data:image')) {
+      const res = await fetch(example.thumb);
+      const blob = await res.blob();
+      const fileName = `thumb_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.png`;
+
+      const { data: uploadData, error: uploadError } = await supabaseClient.storage
+        .from('gesture-thumbs')
+        .upload(fileName, blob, { contentType: 'image/png' });
+
+      if (!uploadError) {
+        const { data: publicData } = supabaseClient.storage
+          .from('gesture-thumbs')
+          .getPublicUrl(fileName);
+        publicUrl = publicData.publicUrl;
+      }
+    }
+
+    const { error } = await supabaseClient
+      .from('gestures')
+      .insert([{
+        label: example.label,
+        features: example.features,
+        thumb_url: publicUrl,
+        mode: example.mode
+      }]);
+
+    if (error) throw error;
+    log(`☁️ Exemplo de "${example.label}" salvo na nuvem com sucesso!`);
+  } catch (err) {
+    log(`⚠️ Erro ao salvar no Supabase: ${err.message}`);
+  }
+}
+
+async function loadStoredGestures() {
+  try {
+    log('☁️ Carregando exemplos salvos no Supabase...');
+    const { data, error } = await supabaseClient
+      .from('gestures')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      log('ℹ️ Nenhum gesto encontrado na nuvem.');
+      return;
+    }
+
+    data.forEach(item => {
+      const example = {
+        label: item.label,
+        features: item.features,
+        thumb: item.thumb_url,
+        mode: item.mode
+      };
+
+      if (example.mode === 'local') {
+        examplesLocal.push(example);
+        classesLocal.add(example.label);
+      } else {
+        examplesOnline.push(example);
+        classesOnline.add(example.label);
+      }
+
+      if (example.thumb) {
+        const wrap = document.createElement('div');
+        wrap.className = 'example-thumb-wrapper';
+        wrap.innerHTML = `<img src="${example.thumb}" title="${example.label}">`;
+        document.getElementById('thumbs').appendChild(wrap);
+      }
+    });
+
+    updateStats();
+    log(`✅ Carregados ${data.length} exemplos do Supabase!`);
+  } catch (err) {
+    log(`⚠️ Erro ao carregar gestos do Supabase: ${err.message}`);
+  }
+}
+
+async function clearAllExamplesCloud() {
+  try {
+    const { error } = await supabaseClient
+      .from('gestures')
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000');
+
+    if (error) throw error;
+    log('🧹 Banco de dados na nuvem resetado para o novo grupo com sucesso!');
+  } catch (err) {
+    log(`⚠️ Erro ao resetar banco na nuvem: ${err.message}`);
+  }
+}
+
 // ESTADO E VARIÁVEIS GLOBAIS
 // ==========================================
 let activeIA = 'local'; // 'local' | 'online'
@@ -1091,31 +1196,23 @@ const INTERNET_GESTURES = [
 // ==========================================
 // EXTRATOR DE FEATURES GEOMÉTRICAS 3D
 // ==========================================
-// Calcula:
-// 1. Flexão/extensão contínua dos 5 dedos (0.0 = dobrado, 1.0 = esticado)
-// 2. Ângulos das articulações inter-falângicas (MCP-PIP-DIP)
-// 3. Direção do polegar (para cima vs para baixo)
-// 4. Distâncias relativas normalizadas da palma da mão aos dedos
 function extractAdvancedFeatures(hand) {
   const wrist = hand[0];
   const mcps = [1, 5, 9, 13, 17];
   const pips = [2, 6, 10, 14, 18];
   const tips = [4, 8, 12, 16, 20];
 
-  // Escala de referência: distância Wrist -> MCP Médio (Landmark 9)
   const scale = Math.hypot(hand[9].x - wrist.x, hand[9].y - wrist.y, (hand[9].z||0) - (wrist.z||0)) || 1.0;
 
   const fingerExtensions = [];
   const jointAngles = [];
   const normalizedLandmarks = [];
 
-  // 1. Flexão Contínua dos 5 Dedos
   for (let i = 0; i < 5; i++) {
     const tipDist = Math.hypot(hand[tips[i]].x - wrist.x, hand[tips[i]].y - wrist.y, (hand[tips[i]].z||0) - (wrist.z||0));
     const mcpDist = Math.hypot(hand[mcps[i]].x - wrist.x, hand[mcps[i]].y - wrist.y, (hand[mcps[i]].z||0) - (wrist.z||0));
     const ratio = tipDist / mcpDist;
 
-    // Polegar vs Outros Dedos
     let extScore = 0;
     if (i === 0) {
       extScore = Math.max(0, Math.min(1, (ratio - 1.1) / 0.6));
@@ -1124,7 +1221,6 @@ function extractAdvancedFeatures(hand) {
     }
     fingerExtensions.push(extScore);
 
-    // Ângulo MCP -> PIP -> Tip
     const v1 = { x: hand[pips[i]].x - hand[mcps[i]].x, y: hand[pips[i]].y - hand[mcps[i]].y };
     const v2 = { x: hand[tips[i]].x - hand[pips[i]].x, y: hand[tips[i]].y - hand[pips[i]].y };
     const dot = v1.x * v2.x + v1.y * v2.y;
@@ -1134,17 +1230,14 @@ function extractAdvancedFeatures(hand) {
     jointAngles.push(Math.acos(Math.max(-1, Math.min(1, cosAngle))));
   }
 
-  // 2. Direção do Polegar (Up vs Down) em relação à mão
-  const thumbY = hand[4].y - wrist.y; // Em coordenadas de tela, Y cresce para baixo
-  let thumbDirVal = 0; // 0 = neutro, 1 = para cima, -1 = para baixo
+  const thumbY = hand[4].y - wrist.y;
+  let thumbDirVal = 0;
   if (thumbY < -0.2 * scale) thumbDirVal = 1;
   else if (thumbY > 0.15 * scale) thumbDirVal = -1;
 
-  // 3. Toque entre Indicador e Polegar (ex.: gesto OK)
   const distIndexThumb = Math.hypot(hand[4].x - hand[8].x, hand[4].y - hand[8].y) / scale;
   const isTouchOK = distIndexThumb < 0.35 ? 1 : 0;
 
-  // 4. Landmarks 3D normalizados pela escala
   for (const lm of hand) {
     normalizedLandmarks.push((lm.x - wrist.x) / scale);
     normalizedLandmarks.push((lm.y - wrist.y) / scale);
@@ -1160,31 +1253,25 @@ function extractAdvancedFeatures(hand) {
   };
 }
 
-// Distância geométrica ponderada entre duas observações de mão
 function computeHandDistance(featA, featB) {
   let dist = 0;
 
-  // 1. Extensão dos Dedos (peso alto = 3.0)
   for (let i = 0; i < 5; i++) {
     const diff = featA.fingerExtensions[i] - featB.fingerExtensions[i];
     dist += 3.0 * (diff * diff);
   }
 
-  // 2. Ângulos articulares (peso = 2.0)
   for (let i = 0; i < 5; i++) {
     const diff = featA.jointAngles[i] - featB.jointAngles[i];
     dist += 2.0 * (diff * diff);
   }
 
-  // 3. Direção do Polegar (peso = 2.5)
   const thumbDiff = featA.thumbDirVal - featB.thumbDirVal;
   dist += 2.5 * (thumbDiff * thumbDiff);
 
-  // 4. Toque Polegar-Indicador (peso = 2.0)
   const touchDiff = featA.isTouchOK - featB.isTouchOK;
   dist += 2.0 * (touchDiff * touchDiff);
 
-  // 5. Posicionamento 3D Geral (peso = 0.5)
   let lmDist = 0;
   for (let i = 0; i < featA.landmarks.length; i++) {
     const d = featA.landmarks[i] - featB.landmarks[i];
@@ -1195,7 +1282,6 @@ function computeHandDistance(featA, featB) {
   return Math.sqrt(dist);
 }
 
-// ALGORITMO KNN COM PONDERAÇÃO E MARGEM DE CONFIANÇA
 function knnPredictAdvanced(feat, exampleSet) {
   if (!exampleSet.length) return null;
 
@@ -1233,7 +1319,6 @@ function knnPredictAdvanced(feat, exampleSet) {
   return { label: bestLabel, confidence, distance: d0 };
 }
 
-// SUAVIZAÇÃO TEMPORAL DE PREDIÇÃO (FILTRO MAIORIA)
 function smoothPrediction(pred, buffer) {
   if (!pred) return null;
   buffer.push(pred);
@@ -1277,7 +1362,6 @@ function log(msg) {
   logEl.prepend(d);
 }
 
-// MEDIAPIPE HANDS SETUP
 const hands = new Hands({
   locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
 });
@@ -1300,7 +1384,6 @@ function onResults(res) {
   if (res.multiHandLandmarks && res.multiHandLandmarks.length) {
     lastHand = res.multiHandLandmarks[0];
 
-    // Desenhar Conexões com Efeito Neon
     ctx.shadowBlur = 12;
     ctx.shadowColor = '#38bdf8';
     ctx.strokeStyle = 'rgba(56, 189, 248, 0.85)';
@@ -1313,7 +1396,6 @@ function onResults(res) {
       ctx.stroke();
     }
 
-    // Desenhar Pontos das Articulações
     for (let i = 0; i < lastHand.length; i++) {
       const lm = lastHand[i];
       const fingerIdx = i === 0 ? 0 : Math.floor((i - 1) / 4);
@@ -1326,7 +1408,6 @@ function onResults(res) {
       ctx.shadowBlur = 10;
       ctx.fill();
 
-      // Anel Pulsante nos Dedos (Pontas 4, 8, 12, 16, 20)
       if ([4, 8, 12, 16, 20].includes(i)) {
         ctx.beginPath();
         ctx.arc(lm.x * w, lm.y * h, 9, 0, Math.PI * 2);
@@ -1335,9 +1416,8 @@ function onResults(res) {
         ctx.stroke();
       }
     }
-    ctx.shadowBlur = 0; // Reset
+    ctx.shadowBlur = 0;
 
-    // Atualizar Radar Visual de Dedos
     const feats = extractAdvancedFeatures(lastHand);
     updateFingerRadar(feats.fingerExtensions);
 
@@ -1375,7 +1455,6 @@ function resetFingerRadar() {
   });
 }
 
-// INICIAR CÂMERA
 let camera = null;
 async function startCamera() {
   try {
@@ -1395,25 +1474,21 @@ async function startCamera() {
   }
 }
 
-// PREDIÇÃO E RECONHECIMENTO
 let lastPredictAt = 0;
 function predict() {
   const now = Date.now();
-  if (now - lastPredictAt < 200) return; // 5 FPS limite para suavidade
+  if (now - lastPredictAt < 200) return;
   lastPredictAt = now;
   if (!lastHand) return;
 
   const feats = extractAdvancedFeatures(lastHand);
 
-  // IA LOCAL
   const rawPredLocal = knnPredictAdvanced(feats, examplesLocal);
   const resLocal = smoothPrediction(rawPredLocal, predictionBufferLocal);
 
-  // IA CONECTADA
   const rawPredOnline = knnPredictAdvanced(feats, examplesOnline);
   const resOnline = smoothPrediction(rawPredOnline, predictionBufferOnline);
 
-  // Atualizar Interface IA Local
   const big = document.getElementById('bigPrediction');
   const bar = document.getElementById('confBar');
   const txt = document.getElementById('confText');
@@ -1428,7 +1503,6 @@ function predict() {
     txt.textContent = `Confiança: ${resLocal.confidence}%  •  Distância Algorítmica: ${resLocal.distance.toFixed(2)}`;
   }
 
-  // Atualizar Interface IA Conectada
   const bigO = document.getElementById('bigPredictionOnline');
   const barO = document.getElementById('confBarOnline');
   const txtO = document.getElementById('confTextOnline');
@@ -1479,7 +1553,6 @@ function updateDualComparison(resLocal, resOnline) {
   else if (resOnline) mo.classList.add('winner', 'online');
 }
 
-// CAPTURA DE THUMBNAIL
 function captureThumb() {
   try {
     const off = document.createElement('canvas'); off.width = 96; off.height = 96;
@@ -1490,7 +1563,6 @@ function captureThumb() {
   } catch (e) { return null; }
 }
 
-// ENSINAR GESTO
 function teach() {
   const label = labelInput.value.trim().toLowerCase();
   if (!label) { alert('Por favor, digite o nome do gesto primeiro!'); labelInput.focus(); return; }
@@ -1500,23 +1572,26 @@ function teach() {
   teaching = true;
   playSound('capture');
 
-  // Efeito Visual Flash na Câmera
   const flash = document.getElementById('flashOverlay');
   flash.style.opacity = '0.7';
   setTimeout(() => { flash.style.opacity = '0'; }, 150);
 
   const feats = extractAdvancedFeatures(lastHand);
   const thumb = captureThumb();
+  const example = { label, features: feats, thumb, mode: activeIA, createdAt: Date.now() };
 
   if (activeIA === 'local') {
-    examplesLocal.push({ label, features: feats, thumb });
+    examplesLocal.push(example);
     classesLocal.add(label);
     log(`🏫 IA Local aprendeu "${label}". Total: ${examplesLocal.length} exemplo(s)`);
   } else {
-    examplesOnline.push({ label, features: feats, thumb });
+    examplesOnline.push(example);
     classesOnline.add(label);
     log(`🌐 IA Conectada aprendeu "${label}" (novo exemplo). Total: ${examplesOnline.length}`);
   }
+
+  // Salvar no Supabase (Nuvem)
+  saveExampleCloud(example).catch(err => log(`⚠️ Erro ao salvar no Supabase: ${err.message}`));
 
   teaching = false;
   updateStats();
@@ -1533,7 +1608,6 @@ function teach() {
   setTimeout(() => { if (lastHand) overlay.textContent = '✋ Mão detectada! Testando…'; }, 1600);
 }
 
-// ATUALIZAR PAINEL DE ESTATÍSTICAS
 function updateStats() {
   const isLocal = activeIA === 'local';
   const examples = isLocal ? examplesLocal : examplesOnline;
@@ -1576,10 +1650,13 @@ function updateStats() {
   });
 }
 
-// RESETAR TUDO
 function resetAll() {
-  if (!confirm('Deseja resetar todo o conhecimento aprendido? A IA esquecerá todos os gestos.')) return;
+  if (!confirm('Deseja resetar todo o conhecimento aprendido? A IA esquecerá todos os gestos salvos no Supabase.')) return;
   playSound('reset');
+
+  // Limpar Banco na Nuvem (Supabase)
+  clearAllExamplesCloud().catch(err => console.error(err));
+
   examplesLocal = []; classesLocal.clear();
   examplesOnline = []; classesOnline.clear();
   searchedGestures.clear();
@@ -1596,12 +1673,11 @@ function resetAll() {
   document.getElementById('dualPred').style.display = 'none';
 
   logEl.innerHTML = '';
-  log('🔄 Conhecimento da IA foi resetado. Pronto para o próximo grupo!');
+  log('🔄 Conhecimento da IA no Supabase foi resetado. Pronto para o próximo grupo!');
   seedOnlineGestures();
   updateStats();
 }
 
-// SELETOR DE MODO IA
 function setActiveIA(which) {
   activeIA = which;
   document.getElementById('iaLocal').classList.toggle('active', which === 'local');
@@ -1622,7 +1698,6 @@ function setActiveIA(which) {
 document.getElementById('iaLocal').addEventListener('click', () => setActiveIA('local'));
 document.getElementById('iaOnline').addEventListener('click', () => setActiveIA('online'));
 
-// PESQUISA NA BIBLIOTECA DA INTERNET
 function renderKnownList() {
   const el = document.getElementById('knownList');
   el.innerHTML = '';
@@ -1671,10 +1746,8 @@ async function doSearch() {
 btnSearch.addEventListener('click', doSearch);
 searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
-// SEED DE EXEMPLOS DA SINTETIZADOS DA INTERNET
 function seedOnlineGestures() {
   INTERNET_GESTURES.forEach(g => {
-    // Gerar sintetizado para IA Conectada
     const synthFeats = {
       fingerExtensions: g.fingerState,
       jointAngles: g.fingerState.map(s => s ? 0.1 : 1.4),
@@ -1687,7 +1760,6 @@ function seedOnlineGestures() {
   });
 }
 
-// LISTENERS DE EVENTOS
 document.getElementById('btnCamera').addEventListener('click', startCamera);
 document.getElementById('btnPhoto').addEventListener('click', teach);
 document.getElementById('btnTeach').addEventListener('click', teach);
@@ -1706,6 +1778,7 @@ document.addEventListener('keydown', e => {
 
 // INICIALIZAÇÃO
 seedOnlineGestures();
+loadStoredGestures();
 renderKnownList();
 updateStats();
 log('Sistema pronto. Ligue a câmera para iniciar a demonstração!');
