@@ -1251,36 +1251,37 @@ function extractAdvancedFeatures(hand) {
     landmarks: normalizedLandmarks
   };
 }
-
+// Função original de distância sem pesos exagerados
 function computeHandDistance(featA, featB) {
   let dist = 0;
 
   for (let i = 0; i < 5; i++) {
     const diff = featA.fingerExtensions[i] - featB.fingerExtensions[i];
-    dist += 5.0 * (diff * diff);
+    dist += 3.0 * (diff * diff);
   }
 
   for (let i = 0; i < 5; i++) {
     const diff = featA.jointAngles[i] - featB.jointAngles[i];
-    dist += 3.5 * (diff * diff);
+    dist += 2.0 * (diff * diff);
   }
 
   const thumbDiff = featA.thumbDirVal - featB.thumbDirVal;
-  dist += 3.0 * (thumbDiff * thumbDiff);
+  dist += 2.5 * (thumbDiff * thumbDiff);
 
   const touchDiff = featA.isTouchOK - featB.isTouchOK;
-  dist += 3.0 * (touchDiff * touchDiff);
+  dist += 2.0 * (touchDiff * touchDiff);
 
   let lmDist = 0;
   for (let i = 0; i < featA.landmarks.length; i++) {
     const d = featA.landmarks[i] - featB.landmarks[i];
     lmDist += d * d;
   }
-  dist += 0.2 * Math.sqrt(lmDist);
+  dist += 0.5 * Math.sqrt(lmDist);
 
   return Math.sqrt(dist);
 }
 
+// Função original do KNN sem o limiar rígido de rejeição
 function knnPredictAdvanced(feat, exampleSet) {
   if (!exampleSet.length) return null;
 
@@ -1288,12 +1289,6 @@ function knnPredictAdvanced(feat, exampleSet) {
     label: ex.label,
     dist: computeHandDistance(feat, ex.features)
   })).sort((a, b) => a.dist - b.dist);
-
-  // Limiar de rejeição equilibrado (2.4) para evitar falsos positivos
-  const MAX_ALLOWED_DISTANCE = 2.4;
-  if (sorted[0].dist > MAX_ALLOWED_DISTANCE) {
-    return { label: "Gesto Desconhecido", confidence: 0, distance: sorted[0].dist };
-  }
 
   const K = Math.min(5, sorted.length);
   const votes = {};
@@ -1318,7 +1313,7 @@ function knnPredictAdvanced(feat, exampleSet) {
 
   const d0 = sorted[0].dist;
   const rawConf = Math.round((maxVote / totalVote) * 100);
-  const distPenalty = Math.max(0, d0 * 10);
+  const distPenalty = Math.max(0, d0 * 12);
   const confidence = Math.max(10, Math.min(99, Math.round(rawConf - distPenalty)));
 
   return { label: bestLabel, confidence, distance: d0 };
