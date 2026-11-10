@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crouton Alpha — IA que Aprende Gestos | Feira de Ciências</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d1117;
+    --bg2:#111827;
+    --card:rgba(255,255,255,.055);
+    --border:rgba(255,255,255,.09);
+    --text:#f8fafc;
+    --muted:#94a3b8;
+    --accent:#22c55e;
+    --accent2:#38bdf8;
+    --danger:#f87171;
+    --radius:20px;
+    --shadow:0 12px 40px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:'Inter',system-ui,sans-serif; color:var(--text);
+    background:
+      radial-gradient(800px 420px at 18% -8%, rgba(56,189,248,.10), transparent 60%),
+      radial-gradient(700px 420px at 88% 0%, rgba(34,197,94,.08), transparent 60%),
+      linear-gradient(180deg, var(--bg), var(--bg2));
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  header{position:relative;z-index:1;padding:32px 24px 10px;text-align:center}
+  .logo{
+    display:inline-flex;align-items:center;gap:12px;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border); border-radius:999px; padding:7px 16px 7px 7px;
+    margin-bottom:16px;
+  }
+  .logoIcon{
+    width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(135deg,#38bdf8,#22c55e);
+    display:grid;place-items:center;font-size:20px;
+  }
+  .logo span{font-weight:700;letter-spacing:.02em;font-size:14px}
+  .logo small{display:block;font-weight:500;color:var(--muted);font-size:11px;text-align:left;letter-spacing:.06em}
+
+  h1{
+    margin:0; font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(28px,4.5vw,50px); line-height:1.02; letter-spacing:-.025em;
+  }
+  h1 .grad{
+    background:linear-gradient(90deg,#38bdf8,#22c55e);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .sub{color:var(--muted);margin:12px auto 0;max-width:600px;font-size:15.5px;line-height:1.55}
+  .badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+  .badge{
+    background:rgba(255,255,255,.045);border:1px solid var(--border);
+    padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;color:#cbd5e1;
+  }
+
+  main{
+    position:relative;z-index:1;max-width:1180px;margin:20px auto 50px;padding:0 18px;
+    display:grid;grid-template-columns:1.45fr 1fr;gap:18px;align-items:start;
+  }
+  @media(max-width:940px){main{grid-template-columns:1fr}}
+
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:20px; box-shadow:var(--shadow);
+  }
+  .card h2{
+    margin:0 0 14px;font-family:'Space Grotesk',sans-serif;font-size:17px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .card h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+  /* CAMERA */
+  #videoWrap{
+    position:relative;background:#04070f;border-radius:16px;overflow:hidden;aspect-ratio:4/3;
+    border:1px solid rgba(255,255,255,.10);
+  }
+  video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
+  canvas{position:absolute;inset:0;width:100%;height:100%;transform:scaleX(-1);pointer-events:none}
+  #liveBadge{
+    position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:3;
+    background:rgba(0,0,0,.55);
+    padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.08em;
+    display:flex;align-items:center;gap:7px;
+  }
+  #liveBadge i{width:7px;height:7px;border-radius:50%;background:#ef4444;display:block;animation:pulse 1.4s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  #overlayStatus{
+    position:absolute;left:12px;right:12px;bottom:12px;z-index:3;
+    background:rgba(2,6,23,.75);
+    border:1px solid rgba(255,255,255,.10);
+    padding:11px 14px;border-radius:12px;font-weight:600;text-align:center;font-size:14.5px;
+  }
+
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  button{
+    border:0;border-radius:12px;padding:13px 16px;font-weight:700;cursor:pointer;font-size:14.5px;
+    font-family:'Inter',sans-serif; transition:.15s;
+  }
+  button:active{transform:scale(.98)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .btn-primary{
+    background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;flex:1;
+    box-shadow:0 8px 22px rgba(34,197,94,.25);
+  }
+  .btn-primary:hover:not(:disabled){transform:translateY(-1px)}
+  .btn-blue{
+    background:linear-gradient(135deg,#38bdf8,#6366f1);color:#fff;flex:1;
+  }
+  .btn-blue:hover{transform:translateY(-1px)}
+  .btn-ghost{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--border);flex:1}
+  .btn-ghost:hover{background:rgba(255,255,255,.11)}
+  .btn-danger{
+    background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;width:100%;
+  }
+  .btn-danger:hover{transform:translateY(-1px)}
+
+  input[type="text"]{
+    width:100%;padding:13px 15px;border-radius:12px;border:1px solid var(--border);
+    background:rgba(2,6,23,.5);color:var(--text);font-size:15.5px;font-family:'Inter',sans-serif;outline:none;transition:.15s;
+  }
+  input[type="text"]:focus{border-color:rgba(56,189,248,.6)}
+  input[type="text"]::placeholder{color:#64748b}
+  .label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:8px;letter-spacing:.05em;text-transform:uppercase}
+  .small{color:var(--muted);font-size:13.5px;line-height:1.55}
+  .hint{margin-top:10px}
+
+  /* PREDICTION */
+  .predictionBox{
+    margin-top:16px;background:rgba(56,189,248,.06);
+    border:1px solid rgba(56,189,248,.18); border-radius:16px;padding:16px;
+  }
+  #bigPrediction{
+    font-family:'Space Grotesk',sans-serif;font-size:clamp(18px,2.4vw,24px);font-weight:700;
+    text-align:center;min-height:58px;display:flex;align-items:center;justify-content:center;line-height:1.3;
+  }
+  .barWrap{background:rgba(2,6,23,.6);border-radius:999px;height:10px;overflow:hidden;margin-top:10px;border:1px solid var(--border)}
+  .bar{height:100%;background:linear-gradient(90deg,#38bdf8,#22c55e);width:0%;transition:width .35s ease;border-radius:999px}
+  #confText{text-align:center;margin-top:8px;font-size:13px;color:var(--muted);font-weight:600}
+
+  .dangerZone{
+    border:1px solid rgba(248,113,113,.25);background:rgba(239,68,68,.05);
+    padding:14px;border-radius:16px;margin-top:16px;
+  }
+  .dangerZone b{display:flex;align-items:center;gap:8px}
+
+  /* STEPS */
+  .steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+  .step{display:flex;gap:12px;align-items:flex-start}
+  .stepNum{
+    counter-increment:step;flex-shrink:0;
+    background:rgba(56,189,248,.15);color:#7dd3fc;
+    width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:13px;
+    border:1px solid rgba(56,189,248,.25);
+  }
+  .stepNum::before{content:counter(step)}
+  .step div:last-child{font-size:14px;line-height:1.5;color:#e2e8f0}
+
+  .stat{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+  .stat span{color:var(--muted);font-size:14px}
+  .stat b{font-family:'Space Grotesk',sans-serif;font-size:17px}
+
+  #classesList{max-height:240px;overflow:auto;padding-right:4px}
+  #classesList::-webkit-scrollbar{width:6px}
+  #classesList::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:99px}
+  .classItem{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 12px;background:rgba(2,6,23,.45);border:1px solid var(--border);
+    border-radius:12px;margin-top:8px;
+  }
+  .classItem strong{font-size:14.5px;text-transform:capitalize}
+  .pill{
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.10);
+    padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;
+  }
+  .classBarWrap{height:5px;background:rgba(255,255,255,.08);border-radius:99px;margin-top:6px;overflow:hidden}
+  .classBarFill{height:100%;background:linear-gradient(90deg,#38bdf8,#22c55e);border-radius:99px}
+
+  #learningLog{
+    max-height:150px;overflow:auto;background:rgba(2,6,23,.5);
+    border:1px solid var(--border);border-radius:12px;padding:12px;font-size:13px;margin-top:10px;
+  }
+  #learningLog::-webkit-scrollbar{width:6px}
+  #learningLog::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:99px}
+  .logLine{padding:4px 0;color:#cbd5e1;display:flex;gap:8px}
+  .logLine::before{content:"▸";color:#38bdf8}
+
+  .exampleThumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;min-height:4px}
+  .exampleThumbs img{
+    width:58px;height:58px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
+    object-fit:cover;
+  }
+
+  footer{position:relative;z-index:1;text-align:center;color:var(--muted);padding:6px 20px 36px;font-size:13px;line-height:1.7}
+  .kbd{background:rgba(255,255,255,.07);border:1px solid var(--border);border-bottom-width:2px;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700;color:var(--text)}
+  .divider{width:50px;height:1px;background:rgba(255,255,255,.2);margin:22px auto}
+
+  /* ===== SELETOR DE IA ===== */
+  .iaSelector{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  @media(max-width:640px){.iaSelector{grid-template-columns:1fr}}
+  .iaCard{
+    border:1.5px solid var(--border);border-radius:16px;padding:16px;cursor:pointer;
+    background:rgba(2,6,23,.35);transition:.18s;position:relative;
+  }
+  .iaCard:hover{border-color:rgba(255,255,255,.2)}
+  .iaCard.active{border-color:#22c55e;background:rgba(34,197,94,.07)}
+  .iaCard.active.online{border-color:#38bdf8;background:rgba(56,189,248,.07)}
+  .iaCardTop{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .iaIcon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:19px;flex-shrink:0}
+  .iaIcon.local{background:linear-gradient(135deg,#22c55e,#16a34a)}
+  .iaIcon.online{background:linear-gradient(135deg,#38bdf8,#6366f1)}
+  .iaCard h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:15.5px}
+  .iaCard p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+  .iaCheck{position:absolute;top:12px;right:12px;background:#22c55e;color:#052e12;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;opacity:0;transform:scale(.85);transition:.18s}
+  .iaCard.active .iaCheck{opacity:1;transform:scale(1)}
+  .iaCard.active.online .iaCheck{background:#38bdf8;color:#082f49}
+  .iaTag{display:inline-block;margin-top:10px;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.07)}
+  .pulseDot{width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:5px;animation:pulse 1.6s infinite;vertical-align:middle}
+
+  /* predição dupla */
+  .dualPred{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  @media(max-width:640px){.dualPred{grid-template-columns:1fr}}
+  .predMini{border-radius:12px;padding:13px;border:1px solid var(--border);background:rgba(2,6,23,.45);text-align:center}
+  .predMini .who{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  .predMini .what{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;min-height:24px;line-height:1.2}
+  .predMini .conf{color:var(--muted);font-size:12px;margin-top:4px}
+  .predMini.winner{border-color:#22c55e;background:rgba(34,197,94,.07)}
+  .predMini.winner.online{border-color:#38bdf8}
+
+  .searchRow{display:flex;gap:8px}
+  .searchRow input{flex:1}
+  .searchStatus{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(2,6,23,.5);border:1px solid var(--border);font-size:13.5px;min-height:42px;display:none;align-items:center;gap:8px}
+  .searchStatus.show{display:flex}
+  .spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.2);border-top-color:#38bdf8;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .knownList{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .knownChip{background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700}
+  .hiddenPanel{display:none !important}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><div class="logoIcon">✋</div><div style="text-align:left"><span>Crouton Alpha</span><small>FEIRA DE CIÊNCIAS • 2026</small></div></div>
+  <h1>IA que <span class="grad">Aprende Gestos</span><br>na Hora!</h1>
+  <p class="sub">Ensine um gesto com a mão e veja a inteligência artificial aprender — e adivinhar em tempo real, na frente dos visitantes.</p>
+  <div class="badges">
+    <span class="badge">📷 Webcam ao vivo</span>
+    <span class="badge">🧠 Machine Learning no navegador</span>
+    <span class="badge">🔄 Reset entre grupos</span>
+    <span class="badge">⚡ 100% local</span>
+  </div>
+</header>
+
+<!-- ===== SELETOR DE IA ===== -->
+<div style="max-width:1180px;margin:14px auto 0;padding:0 18px;position:relative;z-index:1">
+  <div class="card">
+    <h2><span class="dot"></span> 🤖 Escolha a IA</h2>
+    <div class="iaSelector">
+      <div class="iaCard active" id="iaLocal">
+        <div class="iaCheck">✓ ATIVA</div>
+        <div class="iaCardTop"><div class="iaIcon local">🏫</div><div><h3>IA Local</h3></div></div>
+        <p>Só aprende com o que <b>você mostra</b> na hora, na frente dela. Começa zerada e vai aprendendo gesto por gesto — perfeita para mostrar o <b>processo de aprendizado</b>.</p>
+        <span class="iaTag"><span class="pulseDot"></span>OFFLINE • aprende só com você</span>
+      </div>
+      <div class="iaCard online" id="iaOnline">
+        <div class="iaCheck">✓ ATIVA</div>
+        <div class="iaCardTop"><div class="iaIcon online">🌐</div><div><h3>IA Conectada</h3></div></div>
+        <p>Já <b>pesquisou na internet</b> e sabe os gestos clássicos (joinha, paz, ok…). Você pede um gesto, ela pesquisa e aprende sozinha. Também pode ensinar gestos novos.</p>
+        <span class="iaTag"><span class="pulseDot" style="background:#38bdf8"></span>ONLINE • já sabe pesquisar</span>
+      </div>
+    </div>
+    <p class="small" style="margin:0">👆 Toque em uma IA para trocar. As duas veem a mesma câmera — só muda <b style="color:var(--text)">como elas aprendem</b>.</p>
+  </div>
+</div>
+
+<main>
+  <!-- LEFT -->
+  <section class="card">
+    <h2><span class="dot"></span> Câmera ao vivo</h2>
+    <div id="videoWrap">
+      <video id="video" playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <div id="liveBadge"><i></i> AO VIVO</div>
+      <div id="overlayStatus">Aguardando câmera…</div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn-primary" id="btnCamera">📷 Ligar câmera</button>
+      <button class="btn-ghost" id="btnPhoto" disabled>📸 Capturar exemplo</button>
+    </div>
+    <p class="small hint">Ligue a câmera, faça o gesto, clique em <b style="color:var(--text)">Capturar exemplo</b>. Repita várias vezes e depois teste a adivinhação!</p>
+
+    <!-- PREDIÇÃO IA LOCAL -->
+    <div class="predictionBox" id="predLocalBox">
+      <div id="bigPrediction">🤖 IA Local: ainda não aprendi nada… ensine um gesto!</div>
+      <div class="barWrap"><div class="bar" id="confBar"></div></div>
+      <div id="confText">Confiança: —</div>
+    </div>
+
+    <!-- PREDIÇÃO IA CONECTADA -->
+    <div class="predictionBox hiddenPanel" id="predOnlineBox" style="border-color:rgba(56,189,248,.22);background:rgba(56,189,248,.05)">
+      <div id="bigPredictionOnline" style="font-family:'Space Grotesk',sans-serif;font-size:clamp(18px,2.4vw,24px);font-weight:700;text-align:center;min-height:58px;display:flex;align-items:center;justify-content:center;line-height:1.3">🌐 IA Conectada: já pesquisei e sei alguns gestos! Faça um deles 👇</div>
+      <div class="barWrap"><div class="bar" id="confBarOnline" style="background:linear-gradient(90deg,#38bdf8,#a78bfa)"></div></div>
+      <div id="confTextOnline" style="text-align:center;margin-top:8px;font-size:13px;color:var(--muted);font-weight:600">Confiança: —</div>
+      <div class="knownList" id="knownList"></div>
+    </div>
+
+    <!-- COMPARAÇÃO AO VIVO -->
+    <div class="dualPred" id="dualPred" style="display:none">
+      <div class="predMini" id="miniLocal"><div class="who">🏫 IA Local</div><div class="what">—</div><div class="conf">—</div></div>
+      <div class="predMini" id="miniOnline"><div class="who">🌐 IA Conectada</div><div class="what">—</div><div class="conf">—</div></div>
+    </div>
+
+    <div class="dangerZone">
+      <b>⚙️ Reset para o próximo grupo</b>
+      <p class="small" style="margin:8px 0 12px">Apaga tudo que a IA aprendeu (exemplos e classes). Use entre uma apresentação e outra para começar do zero.</p>
+      <button class="btn-danger" id="btnReset">🧹 Resetar conhecimento da IA</button>
+    </div>
+  </section>
+
+  <!-- RIGHT -->
+  <section>
+    <div class="card">
+      <h2><span class="dot" style="background:#38bdf8"></span> 🎓 Como ensinar a IA</h2>
+      <div class="steps">
+        <div class="step"><div class="stepNum"></div><div>Digite o <b>nome do gesto</b> (ex.: <i>joinha</i>, <i>paz</i>, <i>ok</i>).</div></div>
+        <div class="step"><div class="stepNum"></div><div>Faça o gesto na frente da câmera e clique em <b>Capturar exemplo</b>. Repita <b>5 a 10 vezes</b>, mudando a posição.</div></div>
+        <div class="step"><div class="stepNum"></div><div>Ensine outros gestos com nomes diferentes.</div></div>
+        <div class="step"><div class="stepNum"></div><div>Agora faça um gesto e veja o que a IA <b>adivinha</b> em tempo real!</div></div>
+      </div>
+
+      <!-- PESQUISAR NA INTERNET (só IA Conectada) -->
+      <div id="searchPanel" class="hiddenPanel" style="margin-bottom:16px">
+        <label class="label" for="searchInput">🔍 Peça um gesto — a IA vai pesquisar na internet</label>
+        <div class="searchRow">
+          <input type="text" id="searchInput" placeholder="Ex.: eu te amo (Libras), número 3, arrasou…">
+          <button class="btn-blue" id="btnSearch" style="flex:0 0 auto">🌐 Pesquisar</button>
+        </div>
+        <div class="searchStatus" id="searchStatus"></div>
+        <p class="small hint" style="margin-top:8px">A IA Conectada pesquisa na internet, aprende o gesto e mostra como fazer. Depois ela reconhece na hora! 💡 <i>Na feira, use gestos clássicos que ela já conhece: joinha, paz, ok, coração, tchau, eu te amo…</i></p>
+      </div>
+
+      <label class="label" for="labelInput">🏷️ Nome do gesto</label>
+      <input type="text" id="labelInput" placeholder="Ex.: joinha, paz, ok, coração, tchau" maxlength="40">
+      <div class="row" style="margin-top:12px">
+        <button class="btn-blue" id="btnTeach">➕ Ensinar este gesto</button>
+      </div>
+      <p class="small hint" id="teachHint">💡 Quanto mais exemplos variados, melhor a IA aprende. Tente perto, longe, virando a mão um pouco!</p>
+      <div class="exampleThumbs" id="thumbs"></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <h2><span class="dot" style="background:#a78bfa"></span> 🧠 O que a IA aprendeu?</h2>
+      <div class="stat"><span>Classes (gestos)</span><b id="statClasses">0</b></div>
+      <div class="stat"><span>Total de exemplos</span><b id="statExamples">0</b></div>
+      <div class="stat" style="border-bottom:0"><span>Status do modelo</span><b id="statModel" style="font-size:14px">aguardando exemplos</b></div>
+      <div id="classesList" style="margin-top:8px"></div>
+      <p class="small" style="margin-top:14px;margin-bottom:0">Registro de aprendizado:</p>
+      <div id="learningLog"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Feito com MediaPipe Hands + KNN — nada sai do seu computador.
+  <div class="divider"></div>
+  Atalhos: <span class="kbd">E</span> ensinar &nbsp; <span class="kbd">R</span> reset &nbsp; <span class="kbd">C</span> câmera &nbsp; <span class="kbd">1</span> IA Local &nbsp; <span class="kbd">2</span> IA Conectada
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script>
+// ===== Estado =====
+let activeIA = 'local'; // 'local' | 'online'
+
+// IA LOCAL: só aprende com o que você mostra
+let examplesLocal = [];
+let classesLocal = new Set();
+
+// IA CONECTADA: já sabe gestos clássicos (pesquisou na internet!) + aprende novos
+let examplesOnline = [];
+let classesOnline = new Set();
+let searchedGestures = new Set(); // gestos "pesquisados na internet" nesta sessão
+
+let cameraOn = false;
+let lastHand = null;
+let teaching = false;
+
+// ===== BIBLIOTECA DE GESTOS DA INTERNET =====
+// A IA Conectada "pesquisou na internet" e conhece estes gestos clássicos.
+// Cada gesto é descrito pelo estado dos dedos (dobrado=0, esticado=1) e polegar.
+// Usamos isso como exemplos de referência para o KNN.
+const INTERNET_GESTURES = [
+  { name:'joinha', emoji:'👍', desc:'Polegar para cima, outros dedos fechados', fingers:{thumb:1,index:0,middle:0,ring:0,pinky:0} },
+  { name:'paz', emoji:'✌️', desc:'Indicador e médio levantados (em V)', fingers:{thumb:0,index:1,middle:1,ring:0,pinky:0} },
+  { name:'ok', emoji:'👌', desc:'Indicador e polegar formando um círculo', fingers:{thumb:1,index:1,middle:0,ring:0,pinky:0} },
+  { name:'coração', emoji:'🤟', desc:'Polegar e indicador cruzados', fingers:{thumb:1,index:1,middle:0,ring:0,pinky:0} },
+  { name:'tchau', emoji:'👋', desc:'Todos os dedos abertos, mão aberta', fingers:{thumb:1,index:1,middle:1,ring:1,pinky:1} },
+  { name:'eu te amo (Libras)', emoji:'🤟✊✌️', desc:'Polegar, indicador e mínimo levantados', fingers:{thumb:1,index:1,middle:0,ring:0,pinky:1} },
+  { name:'número 3', emoji:'🤟', desc:'Polegar, indicador e médio levantados', fingers:{thumb:1,index:1,middle:1,ring:0,pinky:0} },
+  { name:'número 2', emoji:'✌️', desc:'Indicador e médio em V (igual paz)', fingers:{thumb:0,index:1,middle:1,ring:0,pinky:0} },
+  { name:'apontando', emoji:'👉', desc:'Indicador esticado, resto fechado', fingers:{thumb:0,index:1,middle:0,ring:0,pinky:0} },
+  { name:'punho fechado', emoji:'✊', desc:'Todos os dedos dobrados', fingers:{thumb:0,index:0,middle:0,ring:0,pinky:0} },
+  { name:'mão aberta', emoji:'🖐️', desc:'Todos os dedos abertos', fingers:{thumb:1,index:1,middle:1,ring:1,pinky:1} },
+  { name:'joinha pra baixo', emoji:'👎', desc:'Polegar para baixo', fingers:{thumb:1,index:0,middle:0,ring:0,pinky:0} },
+  { name:'arrasou', emoji:'🙌', desc:'Mão aberta, dedos esticados', fingers:{thumb:1,index:1,middle:1,ring:1,pinky:1} },
+  { name:'like', emoji:'👍', desc:'Polegar para cima', fingers:{thumb:1,index:0,middle:0,ring:0,pinky:0} },
+];
+
+// Gera exemplos sintéticos a partir de uma descrição de dedos (para a IA Conectada)
+// Cria variações pequenas para o KNN ter referências
+function synthExampleFromFingers(fingers){
+  // Heurística: nosso extrator real de features usa posições 3D, então
+  // para a IA Conectada comparamos pelo estado dos dedos detectado.
+  return { fingers };
+}
+
+function fingersOfHand(hand){
+  // hand: 21 landmarks. Calcula se cada dedo está esticado pela distância
+  // entre a ponta (palm) e a base, em relação ao punho.
+  const wrist=hand[0];
+  const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z);
+  const tips=[4,8,12,16,20]; // polegar, indicador, médio, anelar, mínimo
+  const bases=[2,5,9,13,17];
+  const out={};
+  const names=['thumb','index','middle','ring','pinky'];
+  for(let i=0;i<5;i++){
+    const d=dist(hand[tips[i]],hand[bases[i]]);
+    // Se ponta está longe da base -> dedo esticado
+    out[names[i]] = d > 0.08 ? 1 : 0;
+  }
+  return out;
+}
+
+function fingerDistance(a,b){
+  const keys=['thumb','index','middle','ring','pinky'];
+  let s=0;
+  for(const k of keys){ s += (a[k]-b[k])**2; }
+  return Math.sqrt(s);
+}
+
+function knnPredictFingers(fingers, exampleSet){
+  if(!exampleSet.length) return null;
+  const sorted=[...exampleSet].map(e=>({label:e.label, d:fingerDistance(fingers,e.fingers)})).sort((a,b)=>a.d-b.d);
+  const k=Math.min(4, sorted.length);
+  const votes={};
+  for(let i=0;i<k;i++){ const l=sorted[i].label; votes[l]=(votes[l]||0)+(k-i); }
+  let best=null,bestScore=-1;
+  for(const [label,score] of Object.entries(votes)){ if(score>bestScore){bestScore=score;best=label;} }
+  const d0=sorted[0].d;
+  const conf=Math.max(5, Math.min(98, Math.round(100 - d0*30)));
+  return {label:best, confidence:conf, nearest:d0};
+}
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const overlay = document.getElementById('overlayStatus');
+const labelInput = document.getElementById('labelInput');
+const logEl = document.getElementById('learningLog');
+
+function log(msg){
+  const d=document.createElement('div'); d.className='logLine'; d.textContent=new Date().toLocaleTimeString('pt-BR')+' — '+msg;
+  logEl.prepend(d);
+}
+
+// ===== MediaPipe Hands =====
+const hands = new Hands({locateFile: f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+hands.setOptions({maxNumHands:1, modelComplexity:0, minDetectionConfidence:.5, minTrackingConfidence:.5});
+hands.onResults(onResults);
+
+function onResults(res){
+  const w=canvas.width=video.videoWidth||640;
+  const h=canvas.height=video.videoHeight||480;
+  ctx.clearRect(0,0,w,h);
+  if(res.multiHandLandmarks && res.multiHandLandmarks.length){
+    lastHand=res.multiHandLandmarks[0];
+    for(const lm of lastHand){
+      ctx.beginPath(); ctx.arc(lm.x*w, lm.y*h, 4, 0, Math.PI*2);
+      ctx.fillStyle='#38bdf8'; ctx.fill();
+    }
+    ctx.strokeStyle='rgba(255,255,255,.75)'; ctx.lineWidth=2;
+    const pairs=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+    for(const [a,b] of pairs){
+      ctx.beginPath(); ctx.moveTo(lastHand[a].x*w,lastHand[a].y*h); ctx.lineTo(lastHand[b].x*w,lastHand[b].y*h); ctx.stroke();
+    }
+    if(!teaching) predict();
+    overlay.textContent='✋ mão detectada! '+(teaching?'APRENDENDO…':'testando…');
+  }else{
+    lastHand=null;
+    overlay.textContent='🖐️ mostre sua mão na câmera';
+  }
+}
+
+let camera=null;
+async function startCamera(){
+  try{
+    camera = new Camera(video, {onFrame: async()=>{ await hands.send({image:video}); }, width:640, height:480, facingMode:'user'});
+    await camera.start();
+    cameraOn=true;
+    document.getElementById('btnPhoto').disabled=false;
+    overlay.textContent='Câmera ligada! mostre sua mão 👉';
+    log('Câmera ligada.');
+  }catch(e){ alert('Não consegui abrir a câmera: '+e.message); }
+}
+
+function extractFeatures(hand){
+  const wrist=hand[0];
+  const midDist = Math.hypot(hand[9].x-wrist.x, hand[9].y-wrist.y) || 1;
+  const feats=[];
+  for(const lm of hand){
+    feats.push((lm.x-wrist.x)/midDist);
+    feats.push((lm.y-wrist.y)/midDist);
+    feats.push(((lm.z||0)-(wrist.z||0))/midDist);
+  }
+  return feats;
+}
+
+function distance(a,b){
+  let s=0; for(let i=0;i<a.length;i++){ const d=a[i]-b[i]; s+=d*d; } return Math.sqrt(s);
+}
+
+function knnPredict(features){
+  if(examplesLocal.length===0) return null;
+  const sorted=[...examplesLocal].map(e=>({label:e.label, d:distance(features,e.features)})).sort((a,b)=>a.d-b.d);
+  const k=Math.min(5, sorted.length);
+  const votes={};
+  for(let i=0;i<k;i++){ const l=sorted[i].label; votes[l]=(votes[l]||0)+(k-i); }
+  let best=null,bestScore=-1,total=0;
+  for(const [label,score] of Object.entries(votes)){ total+=score; if(score>bestScore){bestScore=score;best=label;} }
+  const d0=sorted[0].d;
+  const conf=Math.max(5, Math.min(98, Math.round(100 - d0*22)));
+  return {label:best, confidence:conf, nearest:d0, votes};
+}
+
+let lastPredictAt=0;
+function predict(){
+  const now=Date.now();
+  if(now-lastPredictAt<350) return;
+  lastPredictAt=now;
+  if(!lastHand) return;
+
+  const f=extractFeatures(lastHand);
+  const resLocal=knnPredict(f);
+  const fingers=fingersOfHand(lastHand);
+  const resOnline=knnPredictFingers(fingers, examplesOnline);
+
+  // IA LOCAL (painel principal)
+  const big=document.getElementById('bigPrediction');
+  const bar=document.getElementById('confBar');
+  const txt=document.getElementById('confText');
+  if(!resLocal){ big.textContent='🤖 IA Local: ainda não aprendi nada… ensine um gesto!'; bar.style.width='0%'; txt.textContent='Confiança: —'; }
+  else{
+    big.textContent=`🤖 IA Local acha que é: "${resLocal.label}"`;
+    bar.style.width=resLocal.confidence+'%';
+    txt.textContent=`Confiança: ${resLocal.confidence}%  •  distância: ${resLocal.nearest.toFixed(2)}`;
+  }
+
+  // IA CONECTADA (painel principal)
+  const bigO=document.getElementById('bigPredictionOnline');
+  const barO=document.getElementById('confBarOnline');
+  const txtO=document.getElementById('confTextOnline');
+  if(!resOnline){ bigO.textContent='🌐 IA Conectada: nenhuma referência ainda…'; barO.style.width='0%'; txtO.textContent='Confiança: —'; }
+  else{
+    const g=INTERNET_GESTURES.find(x=>x.name===resOnline.label);
+    bigO.textContent=`🌐 IA Conectada acha que é: "${g?g.emoji+' ':''}${resOnline.label}"`;
+    barO.style.width=resOnline.confidence+'%';
+    txtO.textContent=`Confiança: ${resOnline.confidence}%  •  pesquisado na internet ✓`;
+  }
+
+  // COMPARAÇÃO (mostra as duas juntas quando ambas têm dados)
+  updateDual(resLocal, resOnline);
+}
+
+function updateDual(resLocal, resOnline){
+  const dual=document.getElementById('dualPred');
+  if(!resLocal && !resOnline){ dual.style.display='none'; return; }
+  dual.style.display='grid';
+  const ml=document.getElementById('miniLocal');
+  const mo=document.getElementById('miniOnline');
+  ml.classList.remove('winner'); mo.classList.remove('winner');
+  if(resLocal){
+    ml.querySelector('.what').textContent='"'+resLocal.label+'"';
+    ml.querySelector('.conf').textContent=resLocal.confidence+'% • aprendeu com você';
+  }else{
+    ml.querySelector('.what').textContent='ainda não sabe 😶';
+    ml.querySelector('.conf').textContent='ensine um gesto para ela';
+  }
+  if(resOnline){
+    mo.querySelector('.what').textContent='"'+resOnline.label+'"';
+    mo.querySelector('.conf').textContent=resOnline.confidence+'% • pesquisou na internet';
+  }else{
+    mo.querySelector('.what').textContent='—';
+    mo.querySelector('.conf').textContent='—';
+  }
+  // marca quem está mais confiante
+  if(resLocal && resOnline){
+    if(resLocal.confidence>=resOnline.confidence) ml.classList.add('winner');
+    else mo.classList.add('winner');
+  } else if(resLocal){ ml.classList.add('winner'); } else if(resOnline){ mo.classList.add('winner'); }
+}
+
+function captureThumb(){
+  try{
+    const off=document.createElement('canvas'); off.width=96; off.height=96;
+    const octx=off.getContext('2d');
+    const s=Math.min(video.videoWidth, video.videoHeight);
+    octx.drawImage(video, (video.videoWidth-s)/2, (video.videoHeight-s)/2, s, s, 0,0,96,96);
+    return off.toDataURL('image/png');
+  }catch(e){ return null; }
+}
+
+function teach(){
+  const label=labelInput.value.trim().toLowerCase();
+  if(!label){ alert('Digite o nome do gesto primeiro!'); labelInput.focus(); return; }
+  if(!cameraOn){ alert('Ligue a câmera primeiro!'); return; }
+  if(!lastHand){ alert('Mostre sua mão na câmera antes de ensinar!'); return; }
+  teaching=true;
+  const feats=extractFeatures(lastHand);
+  const fingers=fingersOfHand(lastHand);
+  const thumb=captureThumb();
+
+  if(activeIA==='local'){
+    examplesLocal.push({label, features:feats, fingers, thumb});
+    classesLocal.add(label);
+    log(`🏫 IA Local aprendeu "${label}". Total: ${examplesLocal.length} exemplo(s)`);
+  }else{
+    examplesOnline.push({label, features:feats, fingers, thumb});
+    classesOnline.add(label);
+    log(`🌐 IA Conectada aprendeu "${label}" (ensinado). Total: ${examplesOnline.length}`);
+  }
+  teaching=false;
+  updateStats();
+  if(thumb){
+    const img=document.createElement('img'); img.src=thumb; img.style.cssText='width:60px;height:60px;border-radius:12px';
+    document.getElementById('thumbs').appendChild(img);
+  }
+  const who = activeIA==='local' ? 'IA Local' : 'IA Conectada';
+  overlay.textContent=`✅ ${who} aprendeu "${label}"!`;
+  // (efeito de confirmação já está no overlay)
+  setTimeout(()=>{ if(lastHand) overlay.textContent='✋ mão detectada! testando…'; },1800);
+}
+
+function updateStats(){
+  const isLocal = activeIA==='local';
+  const examples = isLocal ? examplesLocal : examplesOnline;
+  const classes = isLocal ? classesLocal : classesOnline;
+  document.getElementById('statClasses').textContent=classes.size;
+  document.getElementById('statExamples').textContent=examples.length;
+  const el=document.getElementById('statModel');
+  if(isLocal){
+    el.textContent= examples.length>=5 ? 'pronto para adivinhar! 🎉' : (examples.length>0? 'aprendendo… ('+examples.length+'/5 exemplos)' : 'aguardando exemplos');
+  }else{
+    el.textContent= examples.length>=3 ? 'pronto! 🎉' : (examples.length>0? 'aprendendo… ('+examples.length+'/3 exemplos)' : 'já sabe gestos da internet 🎓');
+  }
+  const list=document.getElementById('classesList');
+  list.innerHTML='';
+  if(classes.size===0){
+    list.innerHTML='<p class="small" style="margin:10px 0">Nenhum gesto aprendido ainda. Ensine um gesto para começar!</p>';
+    return;
+  }
+  const maxN = Math.max(...[...classes].map(l=>examples.filter(e=>e.label===l).length), 5);
+  [...classes].sort().forEach(label=>{
+    const n=examples.filter(e=>e.label===label).length;
+    const pct=Math.min(100, Math.round((n/maxN)*100));
+    const searched = !isLocal && searchedGestures.has(label);
+    const div=document.createElement('div'); div.className='classItem';
+    div.innerHTML=`<div style="flex:1"><strong>${label}</strong>${searched?' <span style="font-size:11px;background:rgba(56,189,248,.2);padding:2px 8px;border-radius:99px;margin-left:4px">🌐 internet</span>':''}<div class="classBarWrap"><div class="classBarFill" style="width:${pct}%"></div></div></div><span class="pill" style="margin-left:10px">${n} exemplo(s)</span>`;
+    list.appendChild(div);
+  });
+}
+
+function resetAll(){
+  if(!confirm('Resetar TUDO? As duas IAs vão esquecer tudo que aprenderam.')) return;
+  examplesLocal=[]; classesLocal.clear();
+  examplesOnline=[]; classesOnline.clear();
+  searchedGestures.clear();
+  document.getElementById('thumbs').innerHTML='';
+  document.getElementById('bigPrediction').textContent='🤖 IA Local: ainda não aprendi nada… ensine um gesto!';
+  document.getElementById('confBar').style.width='0%';
+  document.getElementById('confText').textContent='Confiança: —';
+  document.getElementById('bigPredictionOnline').textContent='🌐 IA Conectada: já pesquisei e sei alguns gestos! Faça um deles 👇';
+  document.getElementById('confBarOnline').style.width='0%';
+  document.getElementById('confTextOnline').textContent='Confiança: —';
+  document.getElementById('dualPred').style.display='none';
+  logEl.innerHTML='';
+  log('🔄 Conhecimento resetado! Pronto para o próximo grupo.');
+  updateStats();
+}
+
+// ===== SELETOR DE IA =====
+function setActiveIA(which){
+  activeIA=which;
+  const localCard=document.getElementById('iaLocal');
+  const onlineCard=document.getElementById('iaOnline');
+  localCard.classList.toggle('active', which==='local');
+  onlineCard.classList.toggle('active', which==='online');
+  document.getElementById('predLocalBox').classList.toggle('hiddenPanel', which!=='local');
+  document.getElementById('predOnlineBox').classList.toggle('hiddenPanel', which!=='online');
+  document.getElementById('searchPanel').classList.toggle('hiddenPanel', which!=='online');
+  document.getElementById('teachHint').textContent = which==='local'
+    ? '💡 IA Local: quanto mais exemplos variados, melhor ela aprende com você.'
+    : '💡 IA Conectada: ela já sabe gestos clássicos. Você também pode ensinar gestos novos para ela!';
+  updateStats();
+  log(which==='local' ? '🏫 IA Local ativada: só aprende com você na hora.' : '🌐 IA Conectada ativada: já pesquisou na internet + aprende com você.');
+}
+
+document.getElementById('iaLocal').addEventListener('click', ()=>setActiveIA('local'));
+document.getElementById('iaOnline').addEventListener('click', ()=>setActiveIA('online'));
+
+// ===== PESQUISA NA INTERNET (IA Conectada) =====
+function renderKnownList(){
+  const el=document.getElementById('knownList');
+  el.innerHTML='';
+  INTERNET_GESTURES.forEach(g=>{
+    const chip=document.createElement('span');
+    chip.className='knownChip';
+    chip.textContent=`${g.emoji} ${g.name}`;
+    chip.title=g.desc;
+    el.appendChild(chip);
+  });
+}
+
+const btnSearch=document.getElementById('btnSearch');
+const searchInput=document.getElementById('searchInput');
+const searchStatus=document.getElementById('searchStatus');
+
+async function doSearch(){
+  const query=searchInput.value.trim().toLowerCase();
+  if(!query){ alert('Digite o nome do gesto que quer que ela pesquise!'); searchInput.focus(); return; }
+  btnSearch.disabled=true;
+  searchStatus.className='searchStatus show';
+  searchStatus.innerHTML='<div class="spinner"></div> 🌐 Pesquisando na internet por "'+query+'" …';
+  // Simula pesquisa na internet (busca na biblioteca de gestos conhecidos)
+  await new Promise(r=>setTimeout(r, 1200));
+  // tenta encontrar gesto parecido
+  let found=INTERNET_GESTURES.find(g=> g.name.toLowerCase().includes(query) || query.includes(g.name.toLowerCase()) || g.name.toLowerCase().replace(/[()\s]/g,'').includes(query.replace(/\s/g,'')));
+  if(!found){
+    // tenta palavras parciais
+    found=INTERNET_GESTURES.find(g=> query.split(/\s+/).some(w=> w.length>2 && g.name.toLowerCase().includes(w)));
+  }
+  if(found){
+    searchedGestures.add(found.name);
+    // adiciona como exemplo de referência para a IA Conectada
+    const already=examplesOnline.some(e=>e.label===found.name);
+    if(!already){
+      examplesOnline.push({label:found.name, features:null, fingers:found.fingers, thumb:null, fromInternet:true});
+      classesOnline.add(found.name);
+    }
+    searchStatus.innerHTML=`✅ <div><b>${found.emoji} "${found.name}"</b> encontrado na internet!<br><span class="small">${found.desc} — faça esse gesto na frente da câmera e eu reconheço!</span></div>`;
+    log(`🌐 IA Conectada pesquisou e aprendeu "${found.name}" na internet!`);
+  }else{
+    // não encontrou — sugere conhecidos
+    const suggestions=INTERNET_GESTURES.slice(0,6).map(g=>g.emoji+' '+g.name).join(' • ');
+    searchStatus.innerHTML=`😕 Não encontrei "<b>${query}</b>" na minha biblioteca. Tente um destes: ${suggestions}`;
+    log(`😕 IA Conectada não encontrou "${query}" na internet.`);
+  }
+  btnSearch.disabled=false;
+  updateStats();
+}
+
+btnSearch.addEventListener('click', doSearch);
+searchInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+
+document.getElementById('btnCamera').addEventListener('click', startCamera);
+document.getElementById('btnPhoto').addEventListener('click', teach);
+document.getElementById('btnTeach').addEventListener('click', teach);
+document.getElementById('btnReset').addEventListener('click', resetAll);
+labelInput.addEventListener('keydown', e=>{ if(e.key==='Enter') teach(); });
+document.addEventListener('keydown', e=>{
+  const k=e.key.toLowerCase();
+  if(e.target===labelInput || e.target===searchInput) return;
+  if(k==='e') teach();
+  if(k==='r') resetAll();
+  if(k==='c' && !cameraOn) startCamera();
+  if(k==='1') setActiveIA('local');
+  if(k==='2') setActiveIA('online');
+});
+
+// inicialização: IA Conectada já vem com gestos da internet
+INTERNET_GESTURES.forEach(g=>{
+  examplesOnline.push({label:g.name, features:null, fingers:g.fingers, thumb:null, fromInternet:true});
+  classesOnline.add(g.name);
+});
+renderKnownList();
+updateStats();
+log('Pronto! Ligue a câmera e ensine o primeiro gesto.');
+log('🌐 IA Conectada já pesquisou na internet e conhece '+INTERNET_GESTURES.length+' gestos clássicos!');
+</script>
+</body>
+</html>
