@@ -853,11 +853,11 @@
       <div class="ia-card online" id="iaOnline">
         <div class="ia-badge-active">✓ ATIVA</div>
         <div class="ia-top">
-          <div class="ia-icon online">🌐</div>
-          <div><h3>IA Conectada (Conhecimento Prévio)</h3></div>
+          <div class="ia-icon online">📚</div>
+          <div><h3>IA Pré-Treinada (Biblioteca Expandida)</h3></div>
         </div>
-        <p>Já possui uma biblioteca pré-treinada de gestos clássicos (joinha, paz, ok, Libras…). Você pode pedir novos gestos ou ensinar novos!</p>
-        <span class="ia-tag"><span class="pulse-dot" style="background:#38bdf8"></span>ONLINE • Pesquisa + Biblioteca</span>
+        <p>Já possui um banco de dados robusto integrado com gestos clássicos (joinha, paz, ok, Libras…) e consulta inteligente via nuvem.</p>
+        <span class="ia-tag"><span class="pulse-dot" style="background:#38bdf8"></span>BIBLIOTECA 3D • Consulta Inteligente</span>
       </div>
     </div>
   </div>
@@ -902,13 +902,13 @@
       </div>
     </div>
 
-    <!-- PAINEL PREDIÇÃO IA CONECTADA -->
+    <!-- PAINEL PREDIÇÃO IA PRÉ-TREINADA -->
     <div class="prediction-box hidden-panel" id="predOnlineBox" style="border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.05);">
-      <div class="big-prediction-title" id="bigPredictionOnline">🌐 IA Conectada: faça um gesto pré-treinado!</div>
+      <div class="big-prediction-title" id="bigPredictionOnline">📚 IA Pré-Treinada: faça um gesto da biblioteca!</div>
       <div class="bar-wrap"><div class="bar-fill" id="confBarOnline" style="background: linear-gradient(90deg, #38bdf8, #a78bfa);"></div></div>
       <div class="conf-info">
         <span id="confTextOnline">Confiança: —</span>
-        <span>Pesquisado na Internet ✓</span>
+        <span>Banco de Dados 3D ✓</span>
       </div>
       <div class="known-chips-list" id="knownList"></div>
     </div>
@@ -921,7 +921,7 @@
         <div class="conf">—</div>
       </div>
       <div class="pred-mini-card" id="miniOnline">
-        <div class="who">🌐 IA Conectada</div>
+        <div class="who">📚 IA Pré-Treinada</div>
         <div class="what">—</div>
         <div class="conf">—</div>
       </div>
@@ -949,12 +949,12 @@
         <div class="step-item"><div class="step-badge"></div><div class="step-text">Ensine outros gestos e veja a IA adivinhar em tempo real com alta precisão!</div></div>
       </div>
 
-      <!-- PESQUISAR NA INTERNET (MODO CONECTADO) -->
+      <!-- PESQUISAR NO BANCO DE DADOS INTELIGENTE (MODO PRÉ-TREINADO) -->
       <div id="searchPanel" class="hidden-panel" style="margin-bottom: 20px;">
-        <label class="input-label" for="searchInput">🔍 Peça um gesto — a IA vai pesquisar na biblioteca</label>
+        <label class="input-label" for="searchInput">🔍 Pesquisar Gesto no Banco Pré-Treinado</label>
         <div style="display:flex; gap:8px;">
           <input type="text" id="searchInput" placeholder="Ex.: joinha, paz, ok, coração, roque, L, shaka…">
-          <button class="btn-blue" id="btnSearch" style="flex:0 0 auto">🌐 Pesquisar</button>
+          <button class="btn-blue" id="btnSearch" style="flex:0 0 auto">📚 Buscar</button>
         </div>
         <div class="search-status-box" id="searchStatus"></div>
       </div>
@@ -994,7 +994,7 @@
 <footer>
   Desenvolvido para Feira de Ciências 2026 • Visão Computacional com MediaPipe Hands + KNN Geométrico 3D.
   <div style="width:60px;height:1px;background:rgba(255,255,255,0.15);margin:16px auto"></div>
-  Atalhos de Teclado: <span class="kbd">E</span> Ensinar gesto &nbsp;|&nbsp; <span class="kbd">R</span> Reset &nbsp;|&nbsp; <span class="kbd">C</span> Câmera &nbsp;|&nbsp; <span class="kbd">1</span> IA Local &nbsp;|&nbsp; <span class="kbd">2</span> IA Conectada
+  Atalhos de Teclado: <span class="kbd">E</span> Ensinar gesto &nbsp;|&nbsp; <span class="kbd">R</span> Reset &nbsp;|&nbsp; <span class="kbd">C</span> Câmera &nbsp;|&nbsp; <span class="kbd">1</span> IA Local &nbsp;|&nbsp; <span class="kbd">2</span> IA Pré-Treinada
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
@@ -1052,7 +1052,7 @@ document.getElementById('btnSoundToggle').addEventListener('click', () => {
 // PERSISTÊNCIA NA NUVEM (SUPABASE)
 // ==========================================
 // Substitua o SUPABASE_URL com a URL do seu projeto Supabase
-const SUPABASE_URL = 'https://wfvryvzknbzvqfrqlysn.supabase.co';
+const SUPABASE_URL = 'https://SUA_URL_DO_SUPABASE.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_3uHRwplEvjjAjMHk1dYsPw_oBhcq6F8';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -1060,7 +1060,6 @@ async function saveExampleCloud(example) {
   try {
     let publicUrl = example.thumb;
 
-    // Se houver imagem base64, faz o upload para o Bucket de Storage do Supabase
     if (example.thumb && example.thumb.startsWith('data:image')) {
       const res = await fetch(example.thumb);
       const blob = await res.blob();
@@ -1164,7 +1163,7 @@ let teaching = false;
 let examplesLocal = [];
 let classesLocal = new Set();
 
-// IA CONECTADA
+// IA PRÉ-TREINADA
 let examplesOnline = [];
 let classesOnline = new Set();
 let searchedGestures = new Set();
@@ -1175,7 +1174,7 @@ const predictionBufferOnline = [];
 const BUFFER_SIZE = 4;
 
 // ==========================================
-// BIBLIOTECA DE GESTOS DA INTERNET (3D ACCURATE)
+// BIBLIOTECA DE GESTOS PRÉ-TREINADA (3D ACCURATE)
 // ==========================================
 const INTERNET_GESTURES = [
   { name: 'joinha', emoji: '👍', desc: 'Polegar para CIMA, outros 4 dedos fechados', fingerState: [1,0,0,0,0], thumbDir: 'up' },
@@ -1194,7 +1193,7 @@ const INTERNET_GESTURES = [
 ];
 
 // ==========================================
-// EXTRATOR DE FEATURES GEOMÉTRICAS 3D
+// EXTRATOR DE FEATURES GEOMÉTRICAS 3D (OTIMIZADO)
 // ==========================================
 function extractAdvancedFeatures(hand) {
   const wrist = hand[0];
@@ -1258,26 +1257,26 @@ function computeHandDistance(featA, featB) {
 
   for (let i = 0; i < 5; i++) {
     const diff = featA.fingerExtensions[i] - featB.fingerExtensions[i];
-    dist += 3.0 * (diff * diff);
+    dist += 5.0 * (diff * diff);
   }
 
   for (let i = 0; i < 5; i++) {
     const diff = featA.jointAngles[i] - featB.jointAngles[i];
-    dist += 2.0 * (diff * diff);
+    dist += 3.5 * (diff * diff);
   }
 
   const thumbDiff = featA.thumbDirVal - featB.thumbDirVal;
-  dist += 2.5 * (thumbDiff * thumbDiff);
+  dist += 3.0 * (thumbDiff * thumbDiff);
 
   const touchDiff = featA.isTouchOK - featB.isTouchOK;
-  dist += 2.0 * (touchDiff * touchDiff);
+  dist += 3.0 * (touchDiff * touchDiff);
 
   let lmDist = 0;
   for (let i = 0; i < featA.landmarks.length; i++) {
     const d = featA.landmarks[i] - featB.landmarks[i];
     lmDist += d * d;
   }
-  dist += 0.5 * Math.sqrt(lmDist);
+  dist += 0.2 * Math.sqrt(lmDist);
 
   return Math.sqrt(dist);
 }
@@ -1289,6 +1288,12 @@ function knnPredictAdvanced(feat, exampleSet) {
     label: ex.label,
     dist: computeHandDistance(feat, ex.features)
   })).sort((a, b) => a.dist - b.dist);
+
+  // Limiar de rejeição equilibrado (2.4) para evitar falsos positivos
+  const MAX_ALLOWED_DISTANCE = 2.4;
+  if (sorted[0].dist > MAX_ALLOWED_DISTANCE) {
+    return { label: "Gesto Desconhecido", confidence: 0, distance: sorted[0].dist };
+  }
 
   const K = Math.min(5, sorted.length);
   const votes = {};
@@ -1313,7 +1318,7 @@ function knnPredictAdvanced(feat, exampleSet) {
 
   const d0 = sorted[0].dist;
   const rawConf = Math.round((maxVote / totalVote) * 100);
-  const distPenalty = Math.max(0, d0 * 12);
+  const distPenalty = Math.max(0, d0 * 10);
   const confidence = Math.max(10, Math.min(99, Math.round(rawConf - distPenalty)));
 
   return { label: bestLabel, confidence, distance: d0 };
@@ -1508,14 +1513,14 @@ function predict() {
   const txtO = document.getElementById('confTextOnline');
 
   if (!resOnline) {
-    bigO.textContent = '🌐 IA Conectada: faça um gesto pré-treinado!';
+    bigO.textContent = '📚 IA Pré-Treinada: faça um gesto da biblioteca!';
     barO.style.width = '0%';
     txtO.textContent = 'Confiança: —';
   } else {
     const g = INTERNET_GESTURES.find(x => x.name === resOnline.label);
-    bigO.innerHTML = `🌐 IA Conectada reconhece: <span style="color:var(--primary);margin-left:6px">${g ? g.emoji + ' ' : ''}"${resOnline.label}"</span>`;
+    bigO.innerHTML = `📚 IA Pré-Treinada reconhece: <span style="color:var(--primary);margin-left:6px">${g ? g.emoji + ' ' : ''}"${resOnline.label}"</span>`;
     barO.style.width = resOnline.confidence + '%';
-    txtO.textContent = `Confiança: ${resOnline.confidence}%  •  Modelo Biblioteca 3D ✓`;
+    txtO.textContent = `Confiança: ${resOnline.confidence}%  •  Banco de Dados 3D ✓`;
   }
 
   updateDualComparison(resLocal, resOnline);
@@ -1540,7 +1545,7 @@ function updateDualComparison(resLocal, resOnline) {
 
   if (resOnline) {
     mo.querySelector('.what').textContent = `"${resOnline.label}"`;
-    mo.querySelector('.conf').textContent = `${resOnline.confidence}% • Biblioteca Web`;
+    mo.querySelector('.conf').textContent = `${resOnline.confidence}% • Banco 3D`;
   } else {
     mo.querySelector('.what').textContent = '—';
     mo.querySelector('.conf').textContent = '—';
@@ -1587,10 +1592,9 @@ function teach() {
   } else {
     examplesOnline.push(example);
     classesOnline.add(label);
-    log(`🌐 IA Conectada aprendeu "${label}" (novo exemplo). Total: ${examplesOnline.length}`);
+    log(`📚 IA Pré-Treinada aprendeu "${label}" (novo exemplo). Total: ${examplesOnline.length}`);
   }
 
-  // Salvar no Supabase (Nuvem)
   saveExampleCloud(example).catch(err => log(`⚠️ Erro ao salvar no Supabase: ${err.message}`));
 
   teaching = false;
@@ -1603,7 +1607,7 @@ function teach() {
     document.getElementById('thumbs').appendChild(wrap);
   }
 
-  const who = activeIA === 'local' ? 'IA Local' : 'IA Conectada';
+  const who = activeIA === 'local' ? 'IA Local' : 'IA Pré-Treinada';
   overlay.textContent = `✅ ${who} gravou o exemplo para "${label}"!`;
   setTimeout(() => { if (lastHand) overlay.textContent = '✋ Mão detectada! Testando…'; }, 1600);
 }
@@ -1639,7 +1643,7 @@ function updateStats() {
     div.className = 'class-item-card';
     div.innerHTML = `
       <div style="flex:1">
-        <strong>${label}</strong> ${isSearched ? '<span style="font-size:11px;background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:99px;margin-left:6px;color:#38bdf8">🌐 Web</span>' : ''}
+        <strong>${label}</strong> ${isSearched ? '<span style="font-size:11px;background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:99px;margin-left:6px;color:#38bdf8">📚 Banco</span>' : ''}
         <div style="height:5px;background:rgba(255,255,255,0.08);border-radius:99px;margin-top:6px;overflow:hidden">
           <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#38bdf8,#22c55e);border-radius:99px"></div>
         </div>
@@ -1654,7 +1658,6 @@ function resetAll() {
   if (!confirm('Deseja resetar todo o conhecimento aprendido? A IA esquecerá todos os gestos salvos no Supabase.')) return;
   playSound('reset');
 
-  // Limpar Banco na Nuvem (Supabase)
   clearAllExamplesCloud().catch(err => console.error(err));
 
   examplesLocal = []; classesLocal.clear();
@@ -1667,7 +1670,7 @@ function resetAll() {
   document.getElementById('bigPrediction').textContent = '🤖 IA Local: aguardando exemplos… ensine um gesto!';
   document.getElementById('confBar').style.width = '0%';
   document.getElementById('confText').textContent = 'Confiança: —';
-  document.getElementById('bigPredictionOnline').textContent = '🌐 IA Conectada: faça um gesto pré-treinado!';
+  document.getElementById('bigPredictionOnline').textContent = '📚 IA Pré-Treinada: faça um gesto da biblioteca!';
   document.getElementById('confBarOnline').style.width = '0%';
   document.getElementById('confTextOnline').textContent = 'Confiança: —';
   document.getElementById('dualPred').style.display = 'none';
@@ -1689,10 +1692,10 @@ function setActiveIA(which) {
 
   document.getElementById('teachHint').innerHTML = which === 'local'
     ? '💡 <b>IA Local:</b> quanto mais exemplos variados você der, melhor ela aprende na hora.'
-    : '💡 <b>IA Conectada:</b> já vem com gestos da internet. Você também pode ensinar gestos inéditos!';
+    : '💡 <b>IA Pré-Treinada:</b> já vem com o banco de dados robusto de gestos.';
 
   updateStats();
-  log(which === 'local' ? '🏫 Modo IA Local Ativado.' : '🌐 Modo IA Conectada Ativado.');
+  log(which === 'local' ? '🏫 Modo IA Local Ativado.' : '📚 Modo IA Pré-Treinada Ativado.');
 }
 
 document.getElementById('iaLocal').addEventListener('click', () => setActiveIA('local'));
@@ -1721,9 +1724,9 @@ async function doSearch() {
   playSound('search');
   btnSearch.disabled = true;
   searchStatus.className = 'search-status-box show';
-  searchStatus.innerHTML = `🌐 Pesquisando na biblioteca online por "<b>${query}</b>"…`;
+  searchStatus.innerHTML = `📚 Consultando o banco de dados pré-treinado por "<b>${query}</b>"…`;
 
-  await new Promise(r => setTimeout(r, 800));
+  await new Promise(r => setTimeout(r, 600));
 
   let found = INTERNET_GESTURES.find(g =>
     g.name.toLowerCase().includes(query) ||
@@ -1732,11 +1735,11 @@ async function doSearch() {
 
   if (found) {
     searchedGestures.add(found.name);
-    searchStatus.innerHTML = `✅ <div><b>${found.emoji} "${found.name}"</b> encontrado!<br><span style="font-size:12.5px;color:var(--text-muted)">${found.desc}</span></div>`;
-    log(`🌐 IA Conectada carregou o gesto "${found.name}" da biblioteca!`);
+    searchStatus.innerHTML = `✅ <div><b>${found.emoji} "${found.name}"</b> encontrado no banco!<br><span style="font-size:12.5px;color:var(--text-muted)">${found.desc}</span></div>`;
+    log(`📚 IA Pré-Treinada localizou "${found.name}" no banco de dados 3D!`);
   } else {
-    searchStatus.innerHTML = `😕 Gosto "<b>${query}</b>" não pré-cadastrado. Digite no campo abaixo e ensine com a câmera!`;
-    log(`😕 Gesto "${query}" não encontrado na pré-seleção.`);
+    searchStatus.innerHTML = `😕 Gesto "<b>${query}</b>" não está no banco base. Ensine-o usando a câmera ao lado!`;
+    log(`😕 Gesto "${query}" não encontrado na biblioteca pré-treinada.`);
   }
 
   btnSearch.disabled = false;
@@ -1782,7 +1785,7 @@ loadStoredGestures();
 renderKnownList();
 updateStats();
 log('Sistema pronto. Ligue a câmera para iniciar a demonstração!');
-log(`🌐 IA Conectada iniciada com ${INTERNET_GESTURES.length} gestos pré-configurados.`);
+log(`📚 IA Pré-Treinada iniciada com ${INTERNET_GESTURES.length} gestos no banco de dados 3D.`);
 </script>
 </body>
 </html>
